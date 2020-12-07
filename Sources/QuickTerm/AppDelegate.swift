@@ -2,7 +2,9 @@ import SwiftUI
 import AppKit
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-  var window: NSWindow!
+  private var window: NSWindow!
+  private var statusItem : NSStatusItem!
+  private lazy var applicationName = ProcessInfo.processInfo.processName
   func applicationDidFinishLaunching(_ aNotification: Notification) {
     let sessionManager = TerminalSessionManager()
     let contentView = ContentView(sessionManager: sessionManager)
@@ -22,10 +24,38 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     window.tabbingMode = .disallowed
     window.contentView = NSHostingView(rootView: contentView)
     window.makeKeyAndOrderFront(nil)
-    window.isMovable = true
     window.backgroundColor = .clear
 
-    sessionManager.append(TerminalSession("tail -f test.txt"))
+    let statusBar = NSStatusBar.system
+    statusItem = statusBar.statusItem(withLength: NSStatusItem.variableLength)
+    statusItem.button?.title = "⌘"
+    // item?.button?.image = NSImage(named: "MenuBarIcon-Normal")!
+    // item?.button?.alternateImage = NSImage(named: "MenuBarIcon-Selected")!
+
+    let menu = NSMenu()
+
+    menu.addItem(NSMenuItem(title: "About \(applicationName)", action: #selector(self.handleAbout), keyEquivalent: ""))
+    menu.addItem(NSMenuItem.separator())
+    menu.addItem(NSMenuItem(title: "Quit \(applicationName)", action: #selector(NSApplication.terminate(_:)), keyEquivalent: ""))
+
+    statusItem.menu = menu
+  }
+
+  // TODO: When closing the window and
+  // isReleasedWhenClosed is true, the app crashes due to a segmentation fault
+  @objc func handleAbout() {
+    let contentView = AboutView()
+    let aboutWindow = NSWindow(
+      contentRect: NSRect(x: 0, y: 0, width: 345, height: 245),
+      styleMask: [.titled, .closable],
+      backing: .buffered, defer: false
+    )
+    aboutWindow.isReleasedWhenClosed = false
+    aboutWindow.level = .popUpMenu
+    aboutWindow.contentView = NSHostingView(rootView: contentView)
+    aboutWindow.title = "About \(applicationName)"
+    aboutWindow.center()
+    aboutWindow.makeKeyAndOrderFront(nil)
   }
 
   func applicationWillTerminate(_ aNotification: Notification) {
@@ -34,6 +64,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-    return true
+    return false
   }
 }
