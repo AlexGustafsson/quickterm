@@ -3,7 +3,7 @@
 LINKER_FLAGS=-Xlinker -sectcreate -Xlinker __TEXT -Xlinker __info_plist -Xlinker ./Info.plist
 
 build:
-	swift build $(LINKER_FLAGS)
+	swift build --configuration release $(LINKER_FLAGS)
 
 run:
 	swift run $(LINKER_FLAGS)
