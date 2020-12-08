@@ -1,6 +1,9 @@
 import AppKit
 import ArgumentParser
+import Foundation
 import os
+
+import QuickTermShared
 
 let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "main")
 
@@ -20,17 +23,37 @@ func startApplication() throws {
   // TODO: start the daemon in background so this thread can do other things
   logger.log("Initiating application")
   let app = NSApplication.shared
+
+  let appDelegate = AppDelegate()
+  app.delegate = appDelegate
+
   // Hide the application from the dock
   app.setActivationPolicy(.accessory)
-  let delegate = AppDelegate()
-  app.delegate = delegate
+
   logger.info("Starting application")
   app.run()
+
   logger.info("Application closed")
 }
 
 func sendCommandToDaemon(workingDirectory: URL, command: String) throws {
   logger.info("Sending command to daemon")
+
+  let connection = NSXPCConnection(serviceName: "se.axgn.QuickTerm.Broker")
+  connection.remoteObjectInterface = NSXPCInterface(with: ServiceProviderProtocol.self)
+  connection.resume()
+
+  let service = connection.synchronousRemoteObjectProxyWithErrorHandler {
+    error in
+    logger.error("\(error.localizedDescription, privacy: .public)")
+    print("Received error:", error)
+
+  } as? ServiceProviderProtocol
+
+  service!.test() {
+    response in
+    print(response)
+  }
 }
 
 struct Quick: ParsableCommand {

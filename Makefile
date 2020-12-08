@@ -1,21 +1,28 @@
 # Disable echoing of commands
 MAKEFLAGS += --silent
 
-.PHONY: build run lint format package clean
+.PHONY: build run lint format package clean sign
 
-# Add the Info.plist file to the binary
-LINKER_FLAGS=-Xlinker -sectcreate -Xlinker __TEXT -Xlinker __info_plist -Xlinker ./Info.plist
+modules=QuickTerm QuickTermBroker
 
-source := $(shell find Sources -type f -name "*.swift")
-version := $(shell grep 'CFBundleShortVersionString' -A1 Info.plist | tail -1 | sed 's/.*<string>\([^<]\+\)<\/string>.*/\1/')
+sourceToLint := $(shell find Sources -type f -name "*.swift")
 
-build: build/release/QuickTerm
+version := $(shell grep 'CFBundleShortVersionString' -A1 SupportingFiles/QuickTerm/Info.plist | tail -1 | sed 's/.*<string>\([^<]\+\)<\/string>.*/\1/')
 
-build/release/QuickTerm: $(source)
-	swift build --configuration release $(LINKER_FLAGS) --build-path build
+build: build/QuickTerm.app
+
+# Macro to create a rule to build a module
+define buildModule
+build/$(1)/release/$(1): $(shell find "Sources/$(1)" -type f -name "*.swift") SupportingFiles/$(1)/Info.plist
+	swift build --configuration release --product "$(1)" --build-path "build/$(1)"
+endef
+
+# Create the build rule for all modules
+$(foreach module,$(modules),\
+	$(eval $(call buildModule,$(module))))
 
 run:
-	swift run $(LINKER_FLAGS) --build-path build QuickTerm $(args)
+	swift run --build-path build/QuickTerm QuickTerm $(args)
 
 # Requires swift-format
 # brew install swift-format
@@ -29,16 +36,23 @@ format:
 
 package: distribution/QuickTerm\ v$(version).app.zip distribution/QuickTerm\ v$(version).dmg
 
-build/QuickTerm.app: build/release/QuickTerm Info.plist
+build/QuickTermBroker.xpc: build/QuickTermBroker/release/QuickTermBroker SupportingFiles/QuickTermBroker/Info.plist
+	mkdir -p build/QuickTermBroker.xpc/Contents/MacOS
+	cp build/QuickTermBroker/release/QuickTermBroker build/QuickTermBroker.xpc/Contents/MacOS
+	cp SupportingFiles/QuickTermBroker/Info.plist build/QuickTermBroker.xpc/Contents
+
+build/QuickTerm.app: build/QuickTerm/release/QuickTerm SupportingFiles/QuickTerm/Info.plist build/QuickTermBroker.xpc
 	mkdir -p build/QuickTerm.app/Contents/MacOS
-	cp build/release/QuickTerm build/QuickTerm.app/Contents/MacOS
-	cp Info.plist build/QuickTerm.app/Contents
+	mkdir -p build/QuickTerm.app/Contents/XPCServices
+	cp build/QuickTerm/release/QuickTerm build/QuickTerm.app/Contents/MacOS
+	cp SupportingFiles/QuickTerm/Info.plist build/QuickTerm.app/Contents
+	cp -r build/QuickTermBroker.xpc build/QuickTerm.app/Contents/XPCServices
 
 # Requires NPM and clang
-build/QuickTerm\ v$(version).dmg: build/QuickTerm.app
+build/QuickTerm\ $(version).dmg: build/QuickTerm.app
 	# create-dmg exits with 2 if everything worked but it wasn't code signed
 	# due to no identity being defined
-	CXX=clang CC=clang npx create-dmg build/QuickTerm.app build || [[ $$? -eq 2 ]] || exit 1
+	CXX=clang CC=clang npx create-dmg --identity="$(CODESIGN_IDENTITY)" build/QuickTerm.app build || [[ $$? -eq 2 ]] || exit 1
 
 distribution/QuickTerm\ v$(version).app.zip: build/QuickTerm.app
 	mkdir -p distribution
@@ -48,5 +62,11 @@ distribution/QuickTerm\ v$(version).dmg: build/QuickTerm\ $(version).dmg
 	mkdir -p distribution
 	cp "$<" "$@"
 
+sign: build/QuickTerm.app
+	# Use security find-identity -v -p codesigning to find available certificates
+	codesign -o runtime --force --entitlements SupportingFiles/QuickTermBroker/Entitlements.plist --sign "$(CODESIGN_IDENTITY)" --timestamp build/QuickTerm.app/Contents/XPCServices/QuickTermBroker.xpc/Contents/MacOS/QuickTermBroker
+	codesign -o runtime --force --entitlements SupportingFiles/QuickTermBroker/Entitlements.plist --sign "$(CODESIGN_IDENTITY)" --timestamp build/QuickTerm.app/Contents/XPCServices/QuickTermBroker.xpc
+	codesign -o runtime --force --entitlements SupportingFiles/QuickTerm/Entitlements.plist --sign "$(CODESIGN_IDENTITY)" --timestamp build/QuickTerm.app
+
 clean:
-	rm -r build distribution &> /dev/null || true
+	rm -rf build distribution &> /dev/null || true

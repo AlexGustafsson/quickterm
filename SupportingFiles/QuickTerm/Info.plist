@@ -3,7 +3,7 @@
 <plist version="1.0">
 	<dict>
 		<key>CFBundleIdentifier</key>
-		<string>se.axgn.quickterm</string>
+		<string>se.axgn.QuickTerm</string>
 		<key>CFBundleDisplayName</key>
 		<string>QuickTerm</string>
 		<key>CFBundleName</key>
@@ -18,5 +18,7 @@
 		<string>0.1.0</string>
 		<key>CFBundleVersion</key>
 		<string>0.1.0</string>
+		<key>com.apple.security.app-sandbox</key>
+ 		<false/>
 	</dict>
 </plist>

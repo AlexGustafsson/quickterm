@@ -5,6 +5,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   private var window: NSWindow!
   private var statusItem: NSStatusItem!
   private let applicationName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? ""
+
   func applicationDidFinishLaunching(_ aNotification: Notification) {
     let sessionManager = TerminalSessionManager()
     let contentView = ContentView(sessionManager: sessionManager)
