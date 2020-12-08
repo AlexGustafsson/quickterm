@@ -1,9 +1,9 @@
-import SwiftUI
 import AppKit
+import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
   private var window: NSWindow!
-  private var statusItem : NSStatusItem!
+  private var statusItem: NSStatusItem!
   private lazy var applicationName = ProcessInfo.processInfo.processName
   func applicationDidFinishLaunching(_ aNotification: Notification) {
     let sessionManager = TerminalSessionManager()
@@ -15,10 +15,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     window = NSWindow(
-      contentRect: NSRect(x: mainScreen.visibleFrame.width - 345, y: -100, width: 345, height: mainScreen.visibleFrame.height),
+      contentRect: NSRect(
+        x: mainScreen.visibleFrame.width - 345,
+        y: -100,
+        width: 345,
+        height: mainScreen.visibleFrame.height
+      ),
       styleMask: .borderless,
       // styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
-      backing: .buffered, defer: false
+      backing: .buffered,
+      defer: false
     )
     window.level = .floating
     window.tabbingMode = .disallowed
@@ -36,7 +42,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     menu.addItem(NSMenuItem(title: "About \(applicationName)", action: #selector(self.handleAbout), keyEquivalent: ""))
     menu.addItem(NSMenuItem.separator())
-    menu.addItem(NSMenuItem(title: "Quit \(applicationName)", action: #selector(NSApplication.terminate(_:)), keyEquivalent: ""))
+    menu.addItem(
+      NSMenuItem(title: "Quit \(applicationName)", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "")
+    )
 
     statusItem.menu = menu
   }
@@ -48,7 +56,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let aboutWindow = NSWindow(
       contentRect: NSRect(x: 0, y: 0, width: 345, height: 245),
       styleMask: [.titled, .closable],
-      backing: .buffered, defer: false
+      backing: .buffered,
+      defer: false
     )
     aboutWindow.isReleasedWhenClosed = false
     aboutWindow.level = .popUpMenu
@@ -63,7 +72,5 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // Insert code here to tear down your application
   }
 
-  func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-    return false
-  }
+  func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { return false }
 }

@@ -1,5 +1,5 @@
-import os
 import AppKit
+import os
 
 let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "main")
 

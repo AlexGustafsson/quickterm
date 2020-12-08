@@ -1,5 +1,5 @@
-import os
 import Foundation
+import os
 
 class TerminalSessionManager: ObservableObject {
   @Published var items: [TerminalSession] = []
@@ -16,8 +16,8 @@ class TerminalSession: Identifiable, ObservableObject {
   var process: Process!
 
   var stdout: Pipe!
-  var stdoutObserver : NSObjectProtocol!
-  var terminationObserver : NSObjectProtocol!
+  var stdoutObserver: NSObjectProtocol!
+  var terminationObserver: NSObjectProtocol!
 
   var command: String!
   @Published var stdoutOutput = ""
@@ -39,7 +39,8 @@ class TerminalSession: Identifiable, ObservableObject {
     logger.debug("Creating stdout observer")
     self.stdoutObserver = NotificationCenter.default.addObserver(
       forName: NSNotification.Name.NSFileHandleDataAvailable,
-      object: outHandle, queue: nil
+      object: outHandle,
+      queue: nil
     ) {
       notification -> Void in
       let data = outHandle.availableData
@@ -59,7 +60,8 @@ class TerminalSession: Identifiable, ObservableObject {
     logger.debug("Creating termination observer")
     terminationObserver = NotificationCenter.default.addObserver(
       forName: Process.didTerminateNotification,
-      object: process, queue: nil
+      object: process,
+      queue: nil
     ) {
       notification -> Void in
       logger.debug("Removing termination observer")
