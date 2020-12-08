@@ -27,7 +27,7 @@ lint:
 format:
 	swift-format --mode format --configuration swift-format.json --in-place --recursive .
 
-package: distribution/QuickTerm\ $(version).app.zip distribution/QuickTerm\ $(version).dmg
+package: distribution/QuickTerm\ v$(version).app.zip distribution/QuickTerm\ v$(version).dmg
 
 build/QuickTerm.app: build/release/QuickTerm Info.plist
 	mkdir -p build/QuickTerm.app/Contents/MacOS
@@ -35,16 +35,16 @@ build/QuickTerm.app: build/release/QuickTerm Info.plist
 	cp Info.plist build/QuickTerm.app/Contents
 
 # Requires NPM and clang
-build/QuickTerm\ $(version).dmg: build/QuickTerm.app
+build/QuickTerm\ v$(version).dmg: build/QuickTerm.app
 	# create-dmg exits with 2 if everything worked but it wasn't code signed
 	# due to no identity being defined
 	CXX=clang CC=clang npx create-dmg build/QuickTerm.app build || [[ $$? -eq 2 ]] || exit 1
 
-distribution/QuickTerm\ $(version).app.zip: build/QuickTerm.app
+distribution/QuickTerm\ v$(version).app.zip: build/QuickTerm.app
 	mkdir -p distribution
 	zip -r "$@" "$<"
 
-distribution/QuickTerm\ $(version).dmg: build/QuickTerm\ $(version).dmg
+distribution/QuickTerm\ v$(version).dmg: build/QuickTerm\ $(version).dmg
 	mkdir -p distribution
 	cp "$<" "$@"
 

@@ -2,13 +2,14 @@ import Foundation
 import SwiftUI
 
 struct AboutView: View {
-  var applicationName = ProcessInfo.processInfo.processName
+  private let applicationName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? ""
+  private let applicationVersion = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""
 
   var body: some View {
     VStack(alignment: .center) {
       Text("⌘").font(.largeTitle)
       Text(applicationName).font(.headline)
-      Text("App version: v0.1.0").font(.footnote)
+      Text("App version: v\(applicationVersion)").font(.footnote)
       VStack {
         Text("\(applicationName) is Free Open Source Software.")
         Link("Contribute on GitHub", destination: URL(string: "https://github.com/AlexGustafsson/quickterm")!)
