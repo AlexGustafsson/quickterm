@@ -15,7 +15,7 @@ build/release/QuickTerm: $(source)
 	swift build --configuration release $(LINKER_FLAGS) --build-path build
 
 run:
-	swift run $(LINKER_FLAGS) --build-path build
+	swift run $(LINKER_FLAGS) --build-path build QuickTerm $(args)
 
 # Requires swift-format
 # brew install swift-format
