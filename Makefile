@@ -15,9 +15,15 @@ run:
 lint:
 	swift-format --mode lint --configuration swift-format.json --recursive .
 
-# brew install swift-format 
+# brew install swift-format
 format:
 	swift-format --mode format --configuration swift-format.json --in-place --recursive .
+
+package: build
+	mkdir -p build/dist
+	mkdir build/QuickTerm.app
+	cp .build/release/QuickTerm build/QuickTerm.app
+	cp Info.plist build/QuickTerm.app
 
 clean:
 	rm -r .build
