@@ -4,9 +4,17 @@
 	<dict>
 		<key>CFBundleIdentifier</key>
 		<string>se.axgn.quickterm</string>
+		<key>CFBundleDisplayName</key>
+		<string>QuickTerm</string>
+		<key>CFBundleName</key>
+		<string>QuickTerm</string>
 		<key>CFBundlePackageType</key>
 		<string>BNDL</string>
 		<key>NSHumanReadableCopyright</key>
 		<string>Copyright © 2020 Alex Gustafsson. All rights reserved.</string>
+		<key>LSMinimumSystemVersion</key>
+	 	<string>11.0</string>
+		<key>CFBundleShortVersionString</key>
+		<string>v0.1.0</string>
 	</dict>
 </plist>
