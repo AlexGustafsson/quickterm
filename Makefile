@@ -1,7 +1,7 @@
 # Disable echoing of commands
 MAKEFLAGS += --silent
 
-.PHONY: build run lint format package clean sign
+.PHONY: build run lint format package sign logs help clean
 
 modules=QuickTerm QuickTermBroker
 sharedModules=QuickTermShared
@@ -12,6 +12,11 @@ sharedSource := $(shell find Sources/$(sharedModules) -type f -name "*.swift")
 
 version := $(shell grep 'CFBundleShortVersionString' -A1 SupportingFiles/QuickTerm/Info.plist | tail -1 | sed 's/.*<string>\([^<]\+\)<\/string>.*/\1/')
 
+# Produce a short description of available make commands
+help:
+	pcregrep -Mo '^(#.*\n)+^[^# ]+:' Makefile | sed "s/^\([^# ]\+\):/> \1/g" | sed "s/^#\s\+\(.\+\)/\1/g" | GREP_COLORS='ms=1;34' grep -E --color=always '^>.*|$$' | GREP_COLORS='ms=1;37' grep -E --color=always '^[^>].*|$$'
+
+# Build the application
 build: build/QuickTerm.app
 
 # Macro to create a rule to build a module
@@ -24,6 +29,7 @@ endef
 $(foreach module,$(modules),\
 	$(eval $(call buildModule,$(module))))
 
+# Run the application
 run: build/QuickTerm.app
 ifndef args
 	open build/QuickTerm.app
@@ -31,17 +37,17 @@ else
 	./build/QuickTerm.app/Contents/MacOS/QuickTerm $(args)
 endif
 
-
-# Requires swift-format
-# brew install swift-format
+# Lint all Swift code
+# Requires swift-format: brew install swift-format
 lint:
 	swift-format --mode lint --configuration swift-format.json --recursive .
 
-# Requires swift-format
-# brew install swift-format
+# Format all Swift code
+# Requires swift-format: brew install swift-format
 format:
 	swift-format --mode format --configuration swift-format.json --in-place --recursive .
 
+# Package the application, ready for distribution. Does not sign the binaries
 package: distribution/QuickTerm\ v$(version).app.zip distribution/QuickTerm\ v$(version).dmg
 
 build/QuickTermBroker.xpc: build/QuickTermBroker/release/QuickTermBroker SupportingFiles/QuickTermBroker/Info.plist
@@ -70,17 +76,17 @@ distribution/QuickTerm\ v$(version).dmg: build/QuickTerm\ $(version).dmg
 	mkdir -p distribution
 	cp "$<" "$@"
 
+# Sign the built application
+# Use security find-identity -v -p codesigning to find available certificates
 sign: build/QuickTerm.app
-	# Use security find-identity -v -p codesigning to find available certificates
 	codesign -o runtime --force --entitlements SupportingFiles/QuickTermBroker/Entitlements.plist --sign "$(CODESIGN_IDENTITY)" --timestamp build/QuickTerm.app/Contents/XPCServices/QuickTermBroker.xpc/Contents/MacOS/QuickTermBroker
 	codesign -o runtime --force --entitlements SupportingFiles/QuickTermBroker/Entitlements.plist --sign "$(CODESIGN_IDENTITY)" --timestamp build/QuickTerm.app/Contents/XPCServices/QuickTermBroker.xpc
 	codesign -o runtime --force --entitlements SupportingFiles/QuickTerm/Entitlements.plist --sign "$(CODESIGN_IDENTITY)" --timestamp build/QuickTerm.app
 
+# Tail logs produced by QuickTerm
 logs:
-	# TODO: AppleScript to open logs with following filteR
-	# process:QuickTerm
-  # kategori:main
-  # kategori:broker
+	log show --predicate 'process BEGINSWITH "QuickTerm"'
 
+# Remove all dynamically created files
 clean:
 	rm -rf build distribution &> /dev/null || true
