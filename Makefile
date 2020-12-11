@@ -30,6 +30,7 @@ $(foreach module,$(modules),\
 	$(eval $(call buildModule,$(module))))
 
 # Run the application
+# To supply arguments use make run args="argument1 argument2 ..."
 run: build/QuickTerm.app
 ifndef args
 	open build/QuickTerm.app
