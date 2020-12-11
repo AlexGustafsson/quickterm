@@ -6,11 +6,12 @@ struct ContentView: View {
   var body: some View {
     GeometryReader {
       geometry in
-      VStack(alignment: .leading) {
+      VStack {
         ForEach(sessionManager.items) {
           session in
           NotificationView(session: session)
         }
+        Spacer() // Force items up towards the top
       }.frame(width: geometry.size.width, height: geometry.size.height) // Force same size as window
     }
   }
