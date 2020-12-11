@@ -1,6 +1,8 @@
 import Foundation
 import os
 
+import QuickTermShared
+
 class TerminalSessionManager: ObservableObject {
   @Published var items: [TerminalSession] = []
 
@@ -11,63 +13,74 @@ class TerminalSessionManager: ObservableObject {
 }
 
 class TerminalSession: Identifiable, ObservableObject {
-  let id = UUID()
+  public let id = UUID()
 
-  var process: Process!
+  private let process: Process!
 
-  var stdout: Pipe!
-  var stdoutObserver: NSObjectProtocol!
-  var terminationObserver: NSObjectProtocol!
+  private let stdout: Pipe!
+  private let outHandle: FileHandle!
 
-  var command: String!
-  @Published var stdoutOutput = ""
+  public let command: Command!
+  @Published public var stdoutOutput = ""
 
-  init(_ command: String) {
+  init(_ command: Command) {
     self.command = command
 
-    logger.info("Creating session for command \(command)")
+    logger.info("Creating session for command \(command.command)")
     self.process = Process()
     self.process.launchPath = "/usr/bin/env"
-    self.process.arguments = ["bash", "-c", command]
+    self.process.arguments = ["bash", "-c", command.command]
 
     logger.debug("Creating stdout pipe")
     self.stdout = Pipe()
     self.process.standardOutput = stdout
-    let outHandle = stdout.fileHandleForReading
+    outHandle = stdout.fileHandleForReading
     outHandle.waitForDataInBackgroundAndNotify()
 
     logger.debug("Creating stdout observer")
-    self.stdoutObserver = NotificationCenter.default.addObserver(
-      forName: NSNotification.Name.NSFileHandleDataAvailable,
-      object: outHandle,
-      queue: nil
-    ) {
-      notification -> Void in
-      let data = outHandle.availableData
-
-      if data.count > 0 {
-        if let output = String(data: data, encoding: String.Encoding.utf8) {
-          logger.debug("Got output data \(output)")
-          self.stdoutOutput += output
-        }
-        outHandle.waitForDataInBackgroundAndNotify()
-      } else {
-        logger.debug("No more data - removing stdout observer")
-        NotificationCenter.default.removeObserver(self.stdoutObserver as Any)
-      }
-    }
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(self.onDataAvailable),
+      name: NSNotification.Name.NSFileHandleDataAvailable,
+      object: outHandle
+    )
 
     logger.debug("Creating termination observer")
-    terminationObserver = NotificationCenter.default.addObserver(
-      forName: Process.didTerminateNotification,
-      object: process,
-      queue: nil
-    ) {
-      notification -> Void in
-      logger.debug("Removing termination observer")
-      NotificationCenter.default.removeObserver(self.terminationObserver as Any)
-    }
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(self.onTermination),
+      name: Process.didTerminateNotification,
+      object: outHandle
+    )
 
     process.launch()
+  }
+
+  @objc private func onDataAvailable() {
+    let data = self.outHandle.availableData
+
+    if data.count > 0 {
+      if let output = String(data: data, encoding: String.Encoding.utf8) {
+        logger.debug("Got output data \(output)")
+        self.stdoutOutput += output
+      }
+      outHandle.waitForDataInBackgroundAndNotify()
+    } else {
+      logger.debug("No more data - removing stdout observer")
+      NotificationCenter.default.removeObserver(
+        self,
+        name: NSNotification.Name.NSFileHandleDataAvailable,
+        object: outHandle
+      )
+    }
+  }
+
+  @objc private func onTermination() {
+    logger.debug("Removing termination observer")
+    NotificationCenter.default.removeObserver(
+      self,
+      name: Process.didTerminateNotification,
+      object: outHandle
+    )
   }
 }

@@ -1,13 +1,34 @@
 import AppKit
 import SwiftUI
 
+import QuickTermShared
+
 class AppDelegate: NSObject, NSApplicationDelegate {
   private var window: NSWindow!
   private var statusItem: NSStatusItem!
   private let applicationName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? ""
 
+  private let sessionManager: TerminalSessionManager!
+
+  private let executor: CommandExecutor!
+  private let connection: NSXPCConnection!
+  private let listener: NSXPCListener!
+
+  override init() {
+    self.sessionManager = TerminalSessionManager()
+
+    self.connection = NSXPCConnection(serviceName: "se.axgn.QuickTerm.Broker")
+    self.connection.remoteObjectInterface = NSXPCInterface(with: ServiceProviderProtocol.self)
+
+    self.listener = NSXPCListener.anonymous()
+
+    self.executor = CommandExecutor()
+
+    let delegate = CommandExecutorDelegate(executor: executor)
+    self.listener.delegate = delegate;
+  }
+
   func applicationDidFinishLaunching(_ aNotification: Notification) {
-    let sessionManager = TerminalSessionManager()
     let contentView = ContentView(sessionManager: sessionManager)
 
     guard let mainScreen = NSScreen.main else {
@@ -48,6 +69,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     )
 
     statusItem.menu = menu
+
+    executor.onExecuteCommand = {
+      command in
+      logger.info("Received command to execute in \(command.workingDirectory, privacy: .public): \(command.command)")
+      self.sessionManager.append(TerminalSession(command))
+    }
+
+    self.connection.interruptionHandler = {
+      logger.info("Disconnected from broker (interrupted)")
+      // TODO: crash the app?
+    };
+
+    self.connection.invalidationHandler = {
+      logger.info("Disconnected from broker (invalidated)")
+      // TODO: crash the app?
+    };
+
+    logger.info("Connecting to broker")
+    self.listener.resume()
+    self.connection.resume()
+
+    let service = self.connection.synchronousRemoteObjectProxyWithErrorHandler {
+      error in
+      logger.error("\(error.localizedDescription, privacy: .public)")
+      print("Received error:", error)
+
+    } as? ServiceProviderProtocol
+
+    service!.registerCommandExecutor(client: self.listener.endpoint)
   }
 
   // TODO: When closing the window and

@@ -18,7 +18,7 @@
 		<string>0.1.0</string>
 		<key>CFBundleVersion</key>
 		<string>0.1.0</string>
-		<key>com.apple.security.app-sandbox</key>
- 		<false/>
+		<key>LSUIElement</key>
+		<string>true</string>
 	</dict>
 </plist>

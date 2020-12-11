@@ -27,9 +27,6 @@ func startApplication() throws {
   let appDelegate = AppDelegate()
   app.delegate = appDelegate
 
-  // Hide the application from the dock
-  app.setActivationPolicy(.accessory)
-
   logger.info("Starting application")
   app.run()
 
@@ -37,11 +34,22 @@ func startApplication() throws {
 }
 
 func sendCommandToDaemon(workingDirectory: URL, command: String) throws {
-  logger.info("Sending command to daemon")
-
+  logger.debug("Establishing broker connection")
   let connection = NSXPCConnection(serviceName: "se.axgn.QuickTerm.Broker")
   connection.remoteObjectInterface = NSXPCInterface(with: ServiceProviderProtocol.self)
+
+  connection.interruptionHandler = {
+    print("Disconnected from broker (interrupted)")
+    // TODO: Exit(1)
+  };
+
+  connection.invalidationHandler = {
+    print("Disconnected from broker (invalidated)")
+    // TODO: Exit(1)
+  };
+
   connection.resume()
+  logger.debug("Connected to broker")
 
   let service = connection.synchronousRemoteObjectProxyWithErrorHandler {
     error in
@@ -49,11 +57,13 @@ func sendCommandToDaemon(workingDirectory: URL, command: String) throws {
     print("Received error:", error)
 
   } as? ServiceProviderProtocol
+  logger.debug("Got service protocol")
 
-  service!.test() {
-    response in
-    print(response)
-  }
+  logger.info("Sending request to execute command")
+  service!.executeCommand(Command(workingDirectory: workingDirectory, command: command))
+
+  // TODO: Don't run forever, just until the above line succeeds
+  RunLoop.main.run()
 }
 
 struct Quick: ParsableCommand {
@@ -76,18 +86,23 @@ struct Quick: ParsableCommand {
 
   func run() throws {
     let command = arguments.joined(separator: " ")
-    if command == "" {
-      if let daemon = findDaemon() {
+    if let daemon = findDaemon() {
+      if command == "" {
         logger.error("Tried to start daemon when it was already running")
         print("Daemon is already running")
         throw ExitCode(1)
       } else {
-        print("Started daemon")
-        try startApplication()
+        let workingDirectory: URL = URL(string: FileManager.default.currentDirectoryPath)!
+        try sendCommandToDaemon(workingDirectory: workingDirectory, command: command)
       }
     } else {
-      let workingDirectory: URL = URL(string: FileManager.default.currentDirectoryPath)!
-      try sendCommandToDaemon(workingDirectory: workingDirectory, command: command)
+      if command == "" {
+        try startApplication()
+        print("Started daemon")
+      } else {
+        print("Daemon is not running")
+        throw ExitCode(1)
+      }
     }
   }
 }

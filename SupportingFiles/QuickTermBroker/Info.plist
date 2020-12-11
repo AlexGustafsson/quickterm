@@ -8,8 +8,8 @@
     <string>XPC!</string>
     <key>XPCService</key>
     <dict>
-        <key>ServiceType</key>
-        <string>Application</string>
+      <key>ServiceType</key>
+      <string>User</string>
     </dict>
 	</dict>
 </plist>
