@@ -21,7 +21,7 @@ func findDaemon() -> NSRunningApplication? {
 
 func startApplication() throws {
   // TODO: start the daemon in background so this thread can do other things
-  logger.log("Initiating application")
+  logger.info("Initiating application")
   let app = NSApplication.shared
 
   let appDelegate = AppDelegate()

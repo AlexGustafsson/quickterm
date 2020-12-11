@@ -20,6 +20,7 @@ class CommandExecutorDelegate: NSObject, NSXPCListenerDelegate {
 	}
 
 	func listener(_ listener: NSXPCListener, shouldAcceptNewConnection connection: NSXPCConnection) -> Bool {
+		logger.info("Accepting connection")
 		let interface = NSXPCInterface(with: CommandExecutorProtocol.self)
 		interface.setClasses([Command.self as AnyObject as! NSObject], for: #selector(CommandExecutorProtocol.executeCommand), argumentIndex: 0, ofReply: false)
 		connection.exportedInterface = interface

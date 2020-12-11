@@ -1,5 +1,5 @@
 import Foundation
 
-@objc public protocol CommandExecutorProtocol {
+@objc(CommandExecutorProtocol) public protocol CommandExecutorProtocol {
 	func executeCommand(_ command: Command)
 }

@@ -48,7 +48,8 @@ lint:
 format:
 	swift-format --mode format --configuration swift-format.json --in-place --recursive .
 
-# Package the application, ready for distribution. Does not sign the binaries
+# Package the application, ready for distribution. Does not sign the binaries.
+# To package signed binaries run "make build sign package" instead
 package: distribution/QuickTerm\ v$(version).app.zip distribution/QuickTerm\ v$(version).dmg
 
 build/QuickTermBroker.xpc: build/QuickTermBroker/release/QuickTermBroker SupportingFiles/QuickTermBroker/Info.plist
@@ -78,7 +79,8 @@ distribution/QuickTerm\ v$(version).dmg: build/QuickTerm\ $(version).dmg
 	cp "$<" "$@"
 
 # Sign the built application
-# Use security find-identity -v -p codesigning to find available certificates
+# Use "security find-identity -v -p codesigning" to find available certificates.
+# Specify your identity in CODESIGN_IDENTITY
 sign: build/QuickTerm.app
 	codesign -o runtime --force --entitlements SupportingFiles/QuickTermBroker/Entitlements.plist --sign "$(CODESIGN_IDENTITY)" --timestamp build/QuickTerm.app/Contents/XPCServices/QuickTermBroker.xpc/Contents/MacOS/QuickTermBroker
 	codesign -o runtime --force --entitlements SupportingFiles/QuickTermBroker/Entitlements.plist --sign "$(CODESIGN_IDENTITY)" --timestamp build/QuickTerm.app/Contents/XPCServices/QuickTermBroker.xpc

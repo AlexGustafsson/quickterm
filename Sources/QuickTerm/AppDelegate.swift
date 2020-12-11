@@ -10,6 +10,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   private let sessionManager: TerminalSessionManager!
 
+  private let delegate: CommandExecutorDelegate!
   private let executor: CommandExecutor!
   private let connection: NSXPCConnection!
   private let listener: NSXPCListener!
@@ -24,8 +25,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     self.executor = CommandExecutor()
 
-    let delegate = CommandExecutorDelegate(executor: executor)
-    self.listener.delegate = delegate;
+    self.delegate = CommandExecutorDelegate(executor: executor)
+    self.listener.delegate = self.delegate;
   }
 
   func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -92,11 +93,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     let service = self.connection.synchronousRemoteObjectProxyWithErrorHandler {
       error in
-      logger.error("\(error.localizedDescription, privacy: .public)")
-      print("Received error:", error)
-
+      logger.error("Unable to get remote service: \(error.localizedDescription, privacy: .public)")
     } as? ServiceProviderProtocol
 
+    logger.info("Registering self as an executor")
     service!.registerCommandExecutor(client: self.listener.endpoint)
   }
 
