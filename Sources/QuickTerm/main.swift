@@ -63,7 +63,6 @@ func sendCommandToDaemon(workingDirectory: URL, command: String) throws {
   service!.executeCommand(Command(workingDirectory: workingDirectory, command: command))
 
   // TODO: Don't run forever, just until the above line succeeds
-  RunLoop.main.run()
 }
 
 struct Quick: ParsableCommand {
