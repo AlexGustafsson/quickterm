@@ -33,19 +33,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let contentView = ContentView(sessionManager: sessionManager)
 
     guard let mainScreen = NSScreen.main else {
-      assertionFailure()
+      logger.error("Unable to find main screen")
       return
     }
 
     window = NSWindow(
       contentRect: NSRect(
-        x: mainScreen.visibleFrame.width - 345,
-        y: -100,
+        x: mainScreen.visibleFrame.maxX - 345 - 15,
+        y: mainScreen.visibleFrame.minY,
         width: 345,
         height: mainScreen.visibleFrame.height
       ),
+      // Toggling between these two lines are useful for debugging the UI
       styleMask: .borderless,
-      // styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
+      // styleMask: .titled,
       backing: .buffered,
       defer: false
     )
@@ -74,7 +75,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     executor.onExecuteCommand = {
       command in
       logger.info("Received command to execute in \(command.workingDirectory, privacy: .public): \(command.command)")
-      self.sessionManager.append(TerminalSession(command))
+      DispatchQueue.main.async {
+        self.sessionManager.append(TerminalSession(command))
+      }
     }
 
     self.connection.interruptionHandler = {
