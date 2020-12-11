@@ -26,8 +26,11 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
   typealias StartedCallback = (TerminalSession) -> ()
 	var onStarted: StartedCallback = { _ in }
 
-  private(set) var isRunning: Bool = false
-  private(set) var hasFinished: Bool = false
+  @Published private(set) var isRunning: Bool = false
+  @Published private(set) var hasFinished: Bool = false
+  @Published private(set) var exitCode: Int32? = nil
+  /// Valid once hasFinished is true
+  @Published private(set) var wasSuccessful: Bool = false
 
   public let id = UUID()
 
@@ -98,7 +101,8 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
   @objc private func onTermination() {
     logger.info("Process exited with code \(self.process.terminationStatus, privacy: .public)")
     logger.debug("Removing termination observer")
-    logger.debug("Completed with output: \(self.stdoutOutput, privacy: .public)")
+    self.exitCode = self.process.terminationStatus
+    self.wasSuccessful = self.exitCode == 0
     self.hasFinished = true
     self.isRunning = false
     self.onTerminated(self)
