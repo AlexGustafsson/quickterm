@@ -75,8 +75,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     executor.onExecuteCommand = {
       command in
       logger.info("Received command to execute in \(command.workingDirectory, privacy: .public): \(command.command)")
-      DispatchQueue.main.async {
-        self.sessionManager.append(TerminalSession(command))
+      let session = TerminalSession(command)
+
+      // TODO: handle delayed start etc.
+
+      // Add the session when started
+      session.onStarted = {
+        _ in
+        DispatchQueue.main.async {
+          self.sessionManager.append(session)
+        }
+      }
+
+      // Remove the session when terminated
+      session.onTerminated = {
+        _ in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+          self.sessionManager.remove(session)
+        }
+      }
+
+      do {
+        logger.info("Starting session")
+        try session.start()
+      } catch {
+        logger.error("Unable to start session: \(error.localizedDescription)")
       }
     }
 

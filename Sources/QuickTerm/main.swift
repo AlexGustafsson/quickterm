@@ -91,7 +91,7 @@ struct Quick: ParsableCommand {
         print("Daemon is already running")
         throw ExitCode(1)
       } else {
-        let workingDirectory: URL = URL(string: FileManager.default.currentDirectoryPath)!
+        let workingDirectory: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
         try sendCommandToDaemon(workingDirectory: workingDirectory, command: command)
       }
     } else {

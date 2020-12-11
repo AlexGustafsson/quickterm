@@ -10,9 +10,25 @@ class TerminalSessionManager: ObservableObject {
     objectWillChange.send()
     self.items.append(session)
   }
+
+  func remove(_ session: TerminalSession) {
+    objectWillChange.send()
+    if let index = self.items.firstIndex(of: session) {
+      self.items.remove(at: index)
+    }
+  }
 }
 
-class TerminalSession: Identifiable, ObservableObject {
+class TerminalSession: Identifiable, ObservableObject, Equatable {
+  typealias TerminatedCallback = (TerminalSession) -> ()
+	var onTerminated: TerminatedCallback = { _ in }
+
+  typealias StartedCallback = (TerminalSession) -> ()
+	var onStarted: StartedCallback = { _ in }
+
+  private(set) var isRunning: Bool = false
+  private(set) var hasFinished: Bool = false
+
   public let id = UUID()
 
   private let process: Process!
@@ -27,33 +43,42 @@ class TerminalSession: Identifiable, ObservableObject {
     self.command = command
 
     logger.info("Creating session for command \(command.command)")
-    self.process = Process()
-    self.process.launchPath = "/usr/bin/env"
-    self.process.arguments = ["bash", "-c", command.command]
+    var process = Process()
+    process = Process()
+    process.arguments = ["bash", "-c", command.command]
+    process.currentDirectoryURL = command.workingDirectory
+    process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
+    self.process = process
+    logger.debug("Created process")
 
     logger.debug("Creating stdout pipe")
     self.stdout = Pipe()
     self.process.standardOutput = stdout
-    outHandle = stdout.fileHandleForReading
-    outHandle.waitForDataInBackgroundAndNotify()
+    self.outHandle = stdout.fileHandleForReading
+    DispatchQueue.main.async {
+      self.outHandle.waitForDataInBackgroundAndNotify()
+    }
 
     logger.debug("Creating stdout observer")
     NotificationCenter.default.addObserver(
       self,
       selector: #selector(self.onDataAvailable),
-      name: NSNotification.Name.NSFileHandleDataAvailable,
-      object: outHandle
+      name: .NSFileHandleDataAvailable,
+      object: self.outHandle
     )
+  }
 
-    logger.debug("Creating termination observer")
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(self.onTermination),
-      name: Process.didTerminateNotification,
-      object: outHandle
-    )
-
-    process.launch()
+  public func start() throws {
+    logger.info("Starting session \(self.id, privacy: .public)")
+    if !self.isRunning && !self.hasFinished {
+      self.isRunning = true
+      self.process.terminationHandler = {
+        _ in
+        self.onTermination()
+      }
+      try self.process.run()
+      self.onStarted(self)
+    }
   }
 
   @objc private func onDataAvailable() {
@@ -66,21 +91,20 @@ class TerminalSession: Identifiable, ObservableObject {
       }
       outHandle.waitForDataInBackgroundAndNotify()
     } else {
-      logger.debug("No more data - removing stdout observer")
-      NotificationCenter.default.removeObserver(
-        self,
-        name: NSNotification.Name.NSFileHandleDataAvailable,
-        object: outHandle
-      )
+      logger.debug("Received EOF")
     }
   }
 
   @objc private func onTermination() {
+    logger.info("Process exited with code \(self.process.terminationStatus, privacy: .public)")
     logger.debug("Removing termination observer")
-    NotificationCenter.default.removeObserver(
-      self,
-      name: Process.didTerminateNotification,
-      object: outHandle
-    )
+    logger.debug("Completed with output: \(self.stdoutOutput, privacy: .public)")
+    self.hasFinished = true
+    self.isRunning = false
+    self.onTerminated(self)
+  }
+
+  static func ==(lhs: TerminalSession, rhs: TerminalSession) -> Bool {
+    lhs.id == rhs.id
   }
 }
