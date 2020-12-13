@@ -1,7 +1,7 @@
 # Disable echoing of commands
 MAKEFLAGS += --silent
 
-.PHONY: build run lint format package sign logs help clean
+.PHONY: build run test lint format package sign logs help clean
 
 modules=QuickTerm QuickTermBroker
 sharedModules=QuickTermShared
@@ -37,6 +37,10 @@ ifndef args
 else
 	./build/QuickTerm.app/Contents/MacOS/QuickTerm $(args)
 endif
+
+# Run all tests
+test:
+	swift test --build-path "build/test"
 
 # Lint all Swift code
 # Requires swift-format: brew install swift-format

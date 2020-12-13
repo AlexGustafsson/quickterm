@@ -1,6 +1,6 @@
-import QuickTermTestsTests
+import QuickTermLibrary
 import XCTest
 
 var tests = [XCTestCaseEntry]()
-tests += QuickTermTestsTests.allTests()
+tests += QuickTermLibrary.allTests()
 XCTMain(tests)

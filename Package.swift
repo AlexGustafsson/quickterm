@@ -9,6 +9,7 @@ let package = Package(
   products: [
     .library(name: "QuickTermShared", targets: ["QuickTermShared"]),
     .executable(name: "QuickTerm", targets: ["QuickTerm"]),
+    .library(name: "QuickTermLibrary", targets: ["QuickTermLibrary"]),
     .executable(name: "QuickTermBroker", targets: ["QuickTermBroker"])
   ],
   dependencies: [
@@ -25,9 +26,16 @@ let package = Package(
         .unsafeFlags(["-Xlinker", "-sectcreate", "-Xlinker", "__TEXT", "-Xlinker", "__info_plist", "-Xlinker", "./SupportingFiles/QuickTerm/Info.plist"]),
       ]
     ),
+    .target(
+      name: "QuickTermLibrary",
+      dependencies: [
+        .product(name: "ArgumentParser", package: "swift-argument-parser"),
+        "QuickTermShared"
+      ]
+    ),
     .testTarget(
-      name: "QuickTermTests",
-      dependencies: ["QuickTerm"]
+      name: "QuickTermLibraryTests",
+      dependencies: ["QuickTermLibrary"]
     ),
     .target(
       name: "QuickTermBroker",
