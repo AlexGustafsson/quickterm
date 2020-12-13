@@ -68,7 +68,7 @@ func sendCommandToDaemon(workingDirectory: URL, command: String) throws {
 struct Quick: ParsableCommand {
   static let configuration = CommandConfiguration(abstract: "Run a command in a seperate window")
 
-  @Argument(help: ArgumentHelp("Command to execute", valueName: "command"))
+  @Argument(parsing: .unconditionalRemaining, help: ArgumentHelp("Command to execute", valueName: "command"))
   var arguments: [String] = []
 
   @Option(help: "Number of seconds to wait after a command is done before closing the window")
