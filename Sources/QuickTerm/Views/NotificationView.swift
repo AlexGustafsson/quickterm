@@ -5,7 +5,7 @@ struct NotificationView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
-      Text(session.command.command).font(.custom("Fira Mono", size: 11)).foregroundColor(session.hasFinished ? (session.wasSuccessful ? .green : .red) : .white)
+      Text(session.configuration.command).font(.custom("Fira Mono", size: 11)).foregroundColor(session.hasFinished ? (session.wasSuccessful ? .green : .red) : .white)
 
       ScrollView {
         Text(session.stdoutOutput).font(.custom("Fira Mono", size: 11)).frame(maxWidth: .infinity, alignment: .leading)

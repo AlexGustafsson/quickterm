@@ -19,7 +19,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     self.sessionManager = TerminalSessionManager()
 
     self.connection = NSXPCConnection(serviceName: "se.axgn.QuickTerm.Broker")
-    self.connection.remoteObjectInterface = NSXPCInterface(with: ServiceProviderProtocol.self)
+    self.connection.remoteObjectInterface = NSXPCInterface(with: BrokerProtocol.self)
 
     self.listener = NSXPCListener.anonymous()
 
@@ -73,9 +73,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     statusItem.menu = menu
 
     executor.onExecuteCommand = {
-      command in
-      logger.info("Received command to execute in \(command.workingDirectory, privacy: .public): \(command.command)")
-      let session = TerminalSession(command)
+      configuration in
+      logger.info("Received command to execute in \(configuration.workingDirectory, privacy: .public): \(configuration.command)")
+      let session = TerminalSession(configuration)
 
       // TODO: handle delayed start etc.
 
@@ -120,7 +120,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let service = self.connection.synchronousRemoteObjectProxyWithErrorHandler {
       error in
       logger.error("Unable to get remote service: \(error.localizedDescription, privacy: .public)")
-    } as? ServiceProviderProtocol
+    } as? BrokerProtocol
 
     logger.info("Registering self as an executor")
     service!.registerCommandExecutor(client: self.listener.endpoint)

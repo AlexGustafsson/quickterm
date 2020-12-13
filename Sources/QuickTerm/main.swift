@@ -36,7 +36,7 @@ func startApplication() throws {
 func sendCommandToDaemon(workingDirectory: URL, command: String) throws {
   logger.debug("Establishing broker connection")
   let connection = NSXPCConnection(serviceName: "se.axgn.QuickTerm.Broker")
-  connection.remoteObjectInterface = NSXPCInterface(with: ServiceProviderProtocol.self)
+  connection.remoteObjectInterface = NSXPCInterface(with: BrokerProtocol.self)
 
   connection.interruptionHandler = {
     print("Disconnected from broker (interrupted)")
@@ -56,11 +56,11 @@ func sendCommandToDaemon(workingDirectory: URL, command: String) throws {
     logger.error("\(error.localizedDescription, privacy: .public)")
     print("Received error:", error)
 
-  } as? ServiceProviderProtocol
+  } as? BrokerProtocol
   logger.debug("Got service protocol")
 
   logger.info("Sending request to execute command")
-  service!.executeCommand(Command(workingDirectory: workingDirectory, command: command))
+  service!.queueCommand(CommandConfiguration(workingDirectory: workingDirectory, command: command))
 
   // TODO: Don't run forever, just until the above line succeeds
 }

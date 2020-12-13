@@ -39,18 +39,18 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
   private let stdout: Pipe!
   private let outHandle: FileHandle!
 
-  public let command: Command!
+  public let configuration: CommandConfiguration!
   @Published public var stdoutOutput = ""
 
-  init(_ command: Command) {
-    self.command = command
+  init(_ configuration: CommandConfiguration) {
+    self.configuration = configuration
 
-    logger.info("Creating session for command \(command.command)")
+    logger.info("Creating session for command \(configuration.command)")
     var process = Process()
     process = Process()
-    process.arguments = ["bash", "-c", command.command]
-    process.currentDirectoryURL = command.workingDirectory
     process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
+    process.arguments = [configuration.shell, "-c", configuration.command]
+    process.currentDirectoryURL = configuration.workingDirectory
     self.process = process
     logger.debug("Created process")
 

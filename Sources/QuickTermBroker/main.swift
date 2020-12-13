@@ -3,13 +3,14 @@ import os
 
 import QuickTermShared
 
-logger.debug("Establishing broker listener")
 let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "broker")
 
+logger.debug("Creating broker listener")
 let listener = NSXPCListener.service()
 
-let serviceDelegate = ServiceDelegate()
-listener.delegate = serviceDelegate;
+let broker = Broker()
+let delegate = BrokerDelegate(broker)
+listener.delegate = delegate;
 
 logger.info("Listening")
 listener.resume()
