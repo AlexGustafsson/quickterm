@@ -20,7 +20,8 @@ let package = Package(
       name: "QuickTerm",
       dependencies: [
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
-        "QuickTermShared"
+        "QuickTermShared",
+        "QuickTermLibrary"
       ],
       linkerSettings: [
         .unsafeFlags(["-Xlinker", "-sectcreate", "-Xlinker", "__TEXT", "-Xlinker", "__info_plist", "-Xlinker", "./SupportingFiles/QuickTerm/Info.plist"]),

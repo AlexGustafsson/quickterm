@@ -4,11 +4,10 @@ MAKEFLAGS += --silent
 .PHONY: build run test lint format package sign logs help clean
 
 modules=QuickTerm QuickTermBroker
-sharedModules=QuickTermShared
+sharedModules=QuickTermShared QuickTermLibrary
 
 sourceToLint := $(shell find Sources -type f -name "*.swift")
-# TODO: add support for multiple shared modules
-sharedSource := $(shell find Sources/$(sharedModules) -type f -name "*.swift")
+sharedSource := $(shell echo $(sharedModules) | tr ' ' '\n' | while read line; do find "Sources/$$line" -type f -iname '*.swift'; done)
 
 version := $(shell grep 'CFBundleShortVersionString' -A1 SupportingFiles/QuickTerm/Info.plist | tail -1 | sed 's/.*<string>\([^<]\+\)<\/string>.*/\1/')
 
