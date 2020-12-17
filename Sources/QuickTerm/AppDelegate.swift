@@ -4,7 +4,8 @@ import SwiftUI
 import QuickTermShared
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-  private var window: NSWindow!
+  private let notificationViewController: NotificationViewController!
+
   private var statusItem: NSStatusItem!
   private let applicationName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? ""
 
@@ -17,6 +18,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   override init() {
     self.sessionManager = TerminalSessionManager()
+    self.notificationViewController = NotificationViewController(sessionManager: self.sessionManager)
 
     self.connection = NSXPCConnection(serviceName: "se.axgn.QuickTerm.Broker")
     self.connection.remoteObjectInterface = NSXPCInterface(with: BrokerProtocol.self)
@@ -30,37 +32,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   func applicationDidFinishLaunching(_ aNotification: Notification) {
-    let contentView = ContentView(sessionManager: sessionManager)
-
-    guard let mainScreen = NSScreen.main else {
-      logger.error("Unable to find main screen")
-      return
-    }
-
-    window = NSWindow(
-      contentRect: NSRect(
-        x: mainScreen.visibleFrame.maxX - 345 - 15,
-        y: mainScreen.visibleFrame.minY,
-        width: 345,
-        height: mainScreen.visibleFrame.height
-      ),
-      // Toggling between these two lines are useful for debugging the UI
-      styleMask: .borderless,
-      // styleMask: .titled,
-      backing: .buffered,
-      defer: false
-    )
-    window.level = .floating
-    window.tabbingMode = .disallowed
-    window.contentView = NSHostingView(rootView: contentView)
-    window.makeKeyAndOrderFront(nil)
-    window.backgroundColor = .clear
-
     let statusBar = NSStatusBar.system
     statusItem = statusBar.statusItem(withLength: NSStatusItem.variableLength)
     statusItem.button?.title = "⌘"
     // item?.button?.image = NSImage(named: "MenuBarIcon-Normal")!
     // item?.button?.alternateImage = NSImage(named: "MenuBarIcon-Selected")!
+
+    self.notificationViewController.show()
 
     let menu = NSMenu()
 
