@@ -107,19 +107,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   // TODO: When closing the window and
   // isReleasedWhenClosed is true, the app crashes due to a segmentation fault
   @objc func handleAbout() {
-    let contentView = AboutView()
-    let aboutWindow = NSWindow(
-      contentRect: NSRect(x: 0, y: 0, width: 345, height: 245),
-      styleMask: [.titled, .closable],
-      backing: .buffered,
-      defer: false
-    )
-    aboutWindow.isReleasedWhenClosed = false
-    aboutWindow.level = .popUpMenu
-    aboutWindow.contentView = NSHostingView(rootView: contentView)
-    aboutWindow.title = "About \(applicationName)"
-    aboutWindow.center()
-    aboutWindow.makeKeyAndOrderFront(nil)
+    let viewController = AboutViewController()
+    viewController.show()
   }
 
   func applicationWillTerminate(_ aNotification: Notification) {

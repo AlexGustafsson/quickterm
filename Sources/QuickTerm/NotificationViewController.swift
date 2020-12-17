@@ -4,16 +4,16 @@ import SwiftUI
 import QuickTermShared
 
 class NotificationViewController {
-  private var window: NSWindow!
-  private var sessionManager: TerminalSessionManager!
+  private let window: NSWindow!
+  private let sessionManager: TerminalSessionManager!
 
-  init(sessionManager: TerminalSessionManager) {
+  init?(sessionManager: TerminalSessionManager) {
     self.sessionManager = sessionManager
     let contentView = ContentView(sessionManager: self.sessionManager)
 
     guard let mainScreen = NSScreen.main else {
       logger.error("Unable to find main screen")
-      return
+      return nil
     }
 
     self.window = NSWindow(
@@ -32,7 +32,6 @@ class NotificationViewController {
     self.window.level = .floating
     self.window.tabbingMode = .disallowed
     self.window.contentView = NSHostingView(rootView: contentView)
-    self.window.orderOut(nil)
     self.window.backgroundColor = .clear
   }
 
