@@ -5,6 +5,7 @@ import QuickTermShared
 
 class AppDelegate: NSObject, NSApplicationDelegate {
   private let notificationViewController: NotificationViewController!
+  private let inputViewController: InputViewController!
 
   private var statusItem: NSStatusItem!
   private let applicationName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? ""
@@ -19,6 +20,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   override init() {
     self.sessionManager = TerminalSessionManager()
     self.notificationViewController = NotificationViewController(sessionManager: self.sessionManager)
+    self.inputViewController = InputViewController()
 
     self.connection = NSXPCConnection(serviceName: "se.axgn.QuickTerm.Broker")
     self.connection.remoteObjectInterface = NSXPCInterface(with: BrokerProtocol.self)
@@ -43,6 +45,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let menu = NSMenu()
 
     menu.addItem(NSMenuItem(title: "About \(applicationName)", action: #selector(self.handleAbout), keyEquivalent: ""))
+    menu.addItem(NSMenuItem.separator())
+    menu.addItem(NSMenuItem(title: "Show command entry", action: #selector(self.handleCommandEntry), keyEquivalent: ""))
     menu.addItem(NSMenuItem.separator())
     menu.addItem(
       NSMenuItem(title: "Quit \(applicationName)", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "")
@@ -109,6 +113,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   @objc func handleAbout() {
     let viewController = AboutViewController()
     viewController.show()
+  }
+
+  @objc func handleCommandEntry() {
+    self.inputViewController.show()
   }
 
   func applicationWillTerminate(_ aNotification: Notification) {
