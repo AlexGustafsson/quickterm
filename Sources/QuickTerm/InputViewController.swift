@@ -17,6 +17,8 @@ class InputViewController {
   // TODO: save location like Spotlight
   // https://stackoverflow.com/questions/46023769/how-to-show-a-window-without-stealing-focus-on-macos
   // https://stackoverflow.com/questions/15077471/show-window-without-activating-keep-application-below-it-active#comment112101726_15079362
+  // TODO: Handle "TAB completion" for files etc.
+  // TODO: Handle potential completions as text behind input: https://stackoverflow.com/questions/6713391/can-bash-completion-be-invoked-programmatically
   init?() {
     self.windowDelegate = InputWindowDelegate()
     let inputView = InputView()
