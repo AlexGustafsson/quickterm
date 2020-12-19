@@ -78,14 +78,17 @@ func sendCommandToDaemon(_ commandConfiguration: QuickTermShared.CommandConfigur
 struct Quick: ParsableCommand {
   static let configuration = CommandConfiguration(abstract: "Run a command in a seperate window")
 
-  @Option(help: "Number of seconds to wait after a command is done before closing the window")
-  var closeDelay: Double = 2
-
-  @Flag(help: "Whether or not the window should stay until the command finishes or is closed")
-  var stay: Bool = false
-
   @Flag(help: "Whether or not the output should be animated")
   var animate: Bool = false
+
+  @Option(help: "The shell to use")
+  var shell: String = "bash"
+
+  @Option(help: "The number of seconds to wait before terminating the command")
+  var timeout: Double = 5.0
+
+  @Flag(help: "Whether or not the window should stay until the command finishes or is closed")
+  var keep: Bool = false
 
   @Flag(help: "Dump the command configuration as JSON. Will be used if the command is to be ran")
   var dump: Bool = false
@@ -103,8 +106,8 @@ struct Quick: ParsableCommand {
       throw CleanExit.helpRequest()
     }
 
-    guard closeDelay >= 0 else {
-      throw ValidationError("'close-delay' must be larger than or equal to 0")
+    guard timeout >= 0 else {
+      throw ValidationError("'timeout' must be larger than or equal to 0")
     }
   }
 
@@ -120,7 +123,9 @@ struct Quick: ParsableCommand {
         let commandConfiguration = QuickTermShared.CommandConfiguration(
           workingDirectory: workingDirectory,
           command: command,
-          keep: stay,
+          shell: shell,
+          timeout: timeout,
+          keep: keep,
           animate: animate
         )
         if dump {
