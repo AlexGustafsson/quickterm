@@ -68,16 +68,25 @@ func sendCommandToDaemon(workingDirectory: URL, command: String) throws {
 struct Quick: ParsableCommand {
   static let configuration = CommandConfiguration(abstract: "Run a command in a seperate window")
 
-  @Argument(parsing: .unconditionalRemaining, help: ArgumentHelp("Command to execute", valueName: "command"))
-  var arguments: [String] = []
-
   @Option(help: "Number of seconds to wait after a command is done before closing the window")
   var closeDelay: Double = 2
 
   @Flag(help: "Whether or not the window should stay until the command finishes or is closed")
   var stay: Bool = false
 
+  // Add an explicit help flag so that the help flag works even though
+  // uncoditional remaining parsing is used for the arguments below
+  @Flag(name: .shortAndLong, help: .hidden)
+  var help: Bool = false
+
+  @Argument(parsing: .unconditionalRemaining, help: ArgumentHelp("Command to execute", valueName: "command"))
+  var arguments: [String] = []
+
   func validate() throws {
+    if help && arguments.count == 0{
+      throw CleanExit.helpRequest()
+    }
+
     guard closeDelay >= 0 else {
       throw ValidationError("'close-delay' must be larger than or equal to 0")
     }
