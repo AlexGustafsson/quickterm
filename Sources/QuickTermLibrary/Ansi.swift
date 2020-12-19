@@ -37,7 +37,7 @@ public class Ansi {
   public static func format(_ text: String) -> Text {
     var color = Color.white
     var nodes = Ansi.parse(text)
-    var result: Text = Text("Result: \(nodes.count)")
+    var result: Text = Text("")
     for node in nodes {
       switch node {
       case .code(let code):
@@ -54,7 +54,7 @@ public class Ansi {
     var nodes: [AnsiParseTreeNode] = []
     var potentialCode = Substring(text)
     var previousNodeIndex = text.startIndex
-    logger.info("Got text: \(text, privacy: .public)")
+    logger.info("Got text: \(text)")
     while let index = potentialCode.firstIndex(of: Ansi.escape) {
       logger.info("Found index of escape character")
       // Skip the escape code
