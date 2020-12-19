@@ -27,8 +27,8 @@ class InputViewController {
       return nil
     }
 
-    let width = CGFloat(1000)
-    let height = CGFloat(150)
+    let width = CGFloat(880)
+    let height = CGFloat(250)
 
     self.window = BorderlessWindow(
       contentRect: NSRect(
