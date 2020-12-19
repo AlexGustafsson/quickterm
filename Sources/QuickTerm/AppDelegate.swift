@@ -2,6 +2,7 @@ import AppKit
 import SwiftUI
 
 import QuickTermShared
+import HotKey
 
 class AppDelegate: NSObject, NSApplicationDelegate {
   private let notificationViewController: NotificationViewController!
@@ -17,6 +18,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   private let connection: NSXPCConnection!
   private let listener: NSXPCListener!
 
+  private let commandEntryHotKey: HotKey!
+
   override init() {
     self.sessionManager = TerminalSessionManager()
     self.notificationViewController = NotificationViewController(sessionManager: self.sessionManager)
@@ -31,6 +34,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     self.delegate = CommandExecutorDelegate(executor: executor)
     self.listener.delegate = self.delegate;
+
+    self.commandEntryHotKey = HotKey(key: .t, modifiers: [.command, .option])
   }
 
   func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -46,7 +51,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     menu.addItem(NSMenuItem(title: "About \(applicationName)", action: #selector(self.handleAbout), keyEquivalent: ""))
     menu.addItem(NSMenuItem.separator())
-    menu.addItem(NSMenuItem(title: "Show command entry", action: #selector(self.handleCommandEntry), keyEquivalent: ""))
+    menu.addItem(NSMenuItem(title: "Show command entry", action: #selector(self.handleCommandEntry), keyEquivalent: "t", keyEquivalentModifierMask: [NSEvent.ModifierFlags.command, NSEvent.ModifierFlags.option]))
     menu.addItem(NSMenuItem.separator())
     menu.addItem(
       NSMenuItem(title: "Quit \(applicationName)", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "")
@@ -106,6 +111,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     logger.info("Registering self as an executor")
     service!.registerCommandExecutor(client: self.listener.endpoint)
+
+    logger.info("Registering global hotkey")
+
+    self.commandEntryHotKey.keyDownHandler = {
+      self.handleCommandEntry()
+    }
   }
 
   // TODO: When closing the window and
