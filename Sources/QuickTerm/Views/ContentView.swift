@@ -13,7 +13,7 @@ struct ContentView: View {
           NotificationView(session: session)
         }
         Spacer() // Force items up towards the top
-      }.frame(width: geometry.size.width, height: geometry.size.height) // Force same size as window
+      }.transition(AnyTransition.slide).animation(.default).frame(width: geometry.size.width, height: geometry.size.height) // Force same size as window
     }
   }
 }

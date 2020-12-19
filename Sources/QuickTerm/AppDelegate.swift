@@ -61,7 +61,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     executor.onExecuteCommand = {
       configuration in
-      logger.info("Received command to execute in \(configuration.workingDirectory, privacy: .public): \(configuration.command)")
+      if let json = try? configuration.dump() {
+        logger.info("Received command to execute in \(configuration.workingDirectory, privacy: .public): \(json, privacy: .public)")
+      } else {
+        logger.info("Received command to execute in \(configuration.workingDirectory, privacy: .public): \(configuration.command)")
+      }
       let session = TerminalSession(configuration)
 
       // TODO: handle delayed start etc.

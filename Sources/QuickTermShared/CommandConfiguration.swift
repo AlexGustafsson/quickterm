@@ -1,6 +1,6 @@
 import Foundation
 
-@objc public class CommandConfiguration: NSObject, NSSecureCoding {
+@objc public class CommandConfiguration: NSObject, NSSecureCoding, Codable {
 	public static var supportsSecureCoding: Bool { return true }
 
 	// The directory to execute the command in.
@@ -18,6 +18,8 @@ import Foundation
 	public let keep: Bool
 	// The time to start the command. If nil, it will be started as soon as possible.
 	public let startTime: Date
+	// Whether or not to animate the output.
+	public let animate: Bool
 
 	public func encode(with encoder: NSCoder){
 		encoder.encode(self.workingDirectory as NSURL, forKey: "workingDirectory")
@@ -26,6 +28,7 @@ import Foundation
 		encoder.encode(self.timeout, forKey: "timeout")
 		encoder.encode(self.keep, forKey: "keep")
 		encoder.encode(self.startTime as NSDate, forKey: "startTime")
+		encoder.encode(self.animate, forKey: "animate")
 	}
 
 	public required init?(coder decoder: NSCoder) {
@@ -35,7 +38,8 @@ import Foundation
 			let shell = decoder.decodeObject(of: NSString.self, forKey: "shell") as String?,
 			let timeout = decoder.decodeDouble(forKey: "timeout") as Double?,
 			let keep = decoder.decodeBool(forKey: "keep") as Bool?,
-			let startTime = decoder.decodeObject(of: NSDate.self, forKey: "startTime") as Date?
+			let startTime = decoder.decodeObject(of: NSDate.self, forKey: "startTime") as Date?,
+			let animate = decoder.decodeBool(forKey: "animate") as Bool?
 		else {
       return nil
     }
@@ -46,14 +50,34 @@ import Foundation
 		self.timeout = timeout
 		self.keep = keep
 		self.startTime = startTime
+		self.animate = animate
 	}
 
-	public init(workingDirectory: URL, command: String) {
+	public init(
+			workingDirectory: URL,
+			command: String,
+			shell: String = "bash",
+			timeout: Double = 5,
+			keep: Bool = false,
+			startTime: Date? = nil,
+			animate: Bool = false
+	) {
 		self.workingDirectory = workingDirectory
 		self.command = command
-		self.shell = "bash"
-		self.timeout = 5
-		self.keep = false
-		self.startTime = Date()
+		self.shell = shell
+		self.timeout = timeout
+		self.keep = keep
+		self.startTime = startTime ?? Date()
+		self.animate = animate
+	}
+
+	public func dump(pretty: Bool = false) throws -> String {
+		let encoder = JSONEncoder()
+		if pretty {
+			encoder.outputFormatting = .prettyPrinted
+		}
+
+		let data = try encoder.encode(self)
+		return String(data: data, encoding: .utf8)!
 	}
 }

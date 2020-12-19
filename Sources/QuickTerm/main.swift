@@ -43,7 +43,7 @@ func startApplication() throws {
   logger.info("Application closed")
 }
 
-func sendCommandToDaemon(workingDirectory: URL, command: String) throws {
+func sendCommandToDaemon(_ commandConfiguration: QuickTermShared.CommandConfiguration) throws {
   logger.debug("Establishing broker connection")
   let connection = NSXPCConnection(serviceName: "se.axgn.QuickTerm.Broker")
   connection.remoteObjectInterface = NSXPCInterface(with: BrokerProtocol.self)
@@ -70,7 +70,7 @@ func sendCommandToDaemon(workingDirectory: URL, command: String) throws {
   logger.debug("Got service protocol")
 
   logger.info("Sending request to execute command")
-  service!.queueCommand(CommandConfiguration(workingDirectory: workingDirectory, command: command))
+  service!.queueCommand(commandConfiguration)
 
   // TODO: Don't run forever, just until the above line succeeds
 }
@@ -84,6 +84,12 @@ struct Quick: ParsableCommand {
   @Flag(help: "Whether or not the window should stay until the command finishes or is closed")
   var stay: Bool = false
 
+  @Flag(help: "Whether or not the output should be animated")
+  var animate: Bool = false
+
+  @Flag(help: "Dump the command configuration as JSON. Will be used if the command is to be ran")
+  var dump: Bool = false
+
   // Add an explicit help flag so that the help flag works even though
   // uncoditional remaining parsing is used for the arguments below
   @Flag(name: .shortAndLong, help: .hidden)
@@ -93,7 +99,7 @@ struct Quick: ParsableCommand {
   var arguments: [String] = []
 
   func validate() throws {
-    if help && arguments.count == 0{
+    if help && arguments.count == 0 {
       throw CleanExit.helpRequest()
     }
 
@@ -111,7 +117,18 @@ struct Quick: ParsableCommand {
         throw ExitCode(1)
       } else {
         let workingDirectory: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-        try sendCommandToDaemon(workingDirectory: workingDirectory, command: command)
+        let commandConfiguration = QuickTermShared.CommandConfiguration(
+          workingDirectory: workingDirectory,
+          command: command,
+          keep: stay,
+          animate: animate
+        )
+        if dump {
+          let json = try commandConfiguration.dump()
+          print(json)
+        } else {
+          try sendCommandToDaemon(commandConfiguration)
+        }
       }
     } else {
       if command == "" {

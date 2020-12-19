@@ -32,6 +32,7 @@ $(foreach module,$(modules),\
 # To supply arguments use make run args="argument1 argument2 ..."
 run: build/QuickTerm.app
 ifndef args
+	kill -9 "$$(ps aux | grep "$(shell pwd)/build/QuickTerm.app/Contents/MacOS/QuickTerm$$" | tail -1 | awk '{print $$2}')" &> /dev/null || true
 	open build/QuickTerm.app
 else
 	./build/QuickTerm.app/Contents/MacOS/QuickTerm $(args)
