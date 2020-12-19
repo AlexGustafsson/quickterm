@@ -21,7 +21,6 @@ class InputViewController {
   // TODO: Handle potential completions as text behind input: https://stackoverflow.com/questions/6713391/can-bash-completion-be-invoked-programmatically
   init?() {
     self.windowDelegate = InputWindowDelegate()
-    let inputView = InputView()
 
     guard let mainScreen = NSScreen.main else {
       logger.error("Unable to find main screen")
@@ -47,21 +46,27 @@ class InputViewController {
     self.window.level = .floating
     self.window.delegate = self.windowDelegate
     self.window.tabbingMode = .disallowed
-    self.window.contentView = NSHostingView(rootView: inputView)
     self.window.backgroundColor = .clear
     self.window.isOpaque = false
+
+    let inputView = InputView().onExitCommand {
+      self.hide()
+    }
+    self.window.contentView = NSHostingView(rootView: inputView)
   }
 
   public func show() {
-    self.window.makeFirstResponder(nil)
-    self.window.makeKeyAndOrderFront(nil)
-    self.window.orderFrontRegardless()
-    NSApplication.shared.activate(ignoringOtherApps: true)
-    logger.info("Window can become key? \(self.window.canBecomeKey), \(self.window.canBecomeMain)")
-    logger.info("Window is key? \(self.window.isKeyWindow)")
+    DispatchQueue.main.async {
+      self.window.makeFirstResponder(nil)
+      self.window.makeKeyAndOrderFront(nil)
+      self.window.orderFrontRegardless()
+      NSApplication.shared.activate(ignoringOtherApps: true)
+      logger.info("Window can become key? \(self.window.canBecomeKey), \(self.window.canBecomeMain)")
+      logger.info("Window is key? \(self.window.isKeyWindow)")
+    }
   }
 
   public func hide() {
-    self.window.close()
+    self.window.orderOut(nil)
   }
 }
