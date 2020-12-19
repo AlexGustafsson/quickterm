@@ -6,7 +6,8 @@ struct ContentView: View {
   var body: some View {
     GeometryReader {
       geometry in
-      VStack {
+      VStack(spacing: 10) {
+        Spacer().frame(height: 5) // Top offset
         ForEach(sessionManager.items) {
           session in
           NotificationView(session: session)

@@ -4,7 +4,7 @@ import SwiftUI
 struct VisualEffectView: NSViewRepresentable {
   var material: NSVisualEffectView.Material
   var blendingMode: NSVisualEffectView.BlendingMode
-  var cornerRadius: CGFloat
+  var cornerRadius: CGFloat = CGFloat(0)
 
   func makeNSView(context: Context) -> NSVisualEffectView {
     let visualEffectView = NSVisualEffectView()

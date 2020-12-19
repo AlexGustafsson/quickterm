@@ -28,9 +28,8 @@ struct InputView: View {
           material: NSVisualEffectView.Material.popover,
           blendingMode: NSVisualEffectView.BlendingMode.behindWindow,
           cornerRadius: 10
-        )
+        ).shadow(color: Color.black.opacity(0.3), radius: 15, x: 0, y: 25)
       )
-      .shadow(color: Color.black.opacity(0.3), radius: 15, x: 0, y: 25)
     }
     .padding(100)
   }
