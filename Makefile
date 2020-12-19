@@ -67,6 +67,7 @@ build/QuickTerm.app: build/QuickTerm/release/QuickTerm SupportingFiles/QuickTerm
 	cp build/QuickTerm/release/QuickTerm build/QuickTerm.app/Contents/MacOS
 	cp SupportingFiles/QuickTerm/Info.plist build/QuickTerm.app/Contents
 	cp -r build/QuickTermBroker.xpc build/QuickTerm.app/Contents/XPCServices
+	cp -r SupportingFiles/QuickTerm/Resources build/QuickTerm.app/Contents/Resources
 
 # Requires NPM and clang
 build/QuickTerm\ $(version).dmg: build/QuickTerm.app

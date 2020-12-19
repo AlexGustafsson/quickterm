@@ -7,7 +7,7 @@ struct NotificationView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
-      Text(session.configuration.command).font(.custom("Fira Mono", size: 11))
+      Text(session.configuration.command).font(.custom("FiraMono-Regular", size: 11))
         .foregroundColor(session.hasFinished ? (session.wasSuccessful ? .green : .red) : .primary)
       ScrollView {
         outputText
@@ -27,7 +27,7 @@ struct NotificationView: View {
   }
 
   private var outputText: some View {
-    let result = Ansi.format(session.stdoutOutput).font(.custom("Fira Mono", size: 11)).frame(maxWidth: .infinity, alignment: .leading).multilineTextAlignment(.leading)
+    let result = Ansi.format(session.stdoutOutput).font(.custom("FiraMono-Regular", size: 11)).frame(maxWidth: .infinity, alignment: .leading).multilineTextAlignment(.leading)
     return Group {
       if session.configuration.animate {
         result.animation(.default)

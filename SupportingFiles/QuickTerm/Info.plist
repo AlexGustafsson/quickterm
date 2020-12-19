@@ -20,5 +20,7 @@
 		<string>0.1.0</string>
 		<key>LSUIElement</key>
 		<string>true</string>
+		<key>ATSApplicationFontsPath</key>
+		<string>Fonts</string>
 	</dict>
 </plist>

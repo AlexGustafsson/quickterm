@@ -10,9 +10,9 @@ struct InputView: View {
   var body: some View {
     VStack(alignment: .center) {
       HStack(alignment: .center) {
-        Text(">").font(.custom("Fira Mono", size: 22)).foregroundColor(Color.black.opacity(0.5))
+        Text(">").font(.custom("FiraMono-Regular", size: 22)).foregroundColor(Color.black.opacity(0.5))
         TextField("Enter command", text: $command, onEditingChanged: onEditingChanged(_:), onCommit: onCommit)
-          .font(.custom("Fira Mono", size: 22))
+          .font(.custom("FiraMono-Regular", size: 22))
           .background(Color.clear)
           .textFieldStyle(PlainTextFieldStyle())
           .focusable(onFocusChange: onFocusChange)
