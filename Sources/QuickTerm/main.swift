@@ -20,7 +20,16 @@ func findDaemon() -> NSRunningApplication? {
 }
 
 func startApplication() throws {
-  // TODO: start the daemon in background so this thread can do other things
+  // Start the app via launchd instead if started from a terminal
+  // Basically "daemonizes" the app
+  let isInTTY = isatty(0) == 1
+  if isInTTY {
+    let bundlePath = Bundle.main.bundlePath
+    NSWorkspace.shared.open(URL(fileURLWithPath: bundlePath))
+    print("Started daemon")
+    return
+  }
+
   logger.info("Initiating application")
   let app = NSApplication.shared
 
@@ -106,7 +115,6 @@ struct Quick: ParsableCommand {
     } else {
       if command == "" {
         try startApplication()
-        print("Started daemon")
       } else {
         print("Daemon is not running")
         throw ExitCode(1)
