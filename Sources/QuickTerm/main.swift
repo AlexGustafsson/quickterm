@@ -6,6 +6,7 @@ import os
 import QuickTermShared
 
 let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "main")
+var stderr = FileHandle.standardError
 
 func findDaemon() -> NSRunningApplication? {
   let bundleIdentifier = Bundle.main.bundleIdentifier!
@@ -26,7 +27,7 @@ func startApplication() throws {
   if isInTTY {
     let bundlePath = Bundle.main.bundlePath
     NSWorkspace.shared.open(URL(fileURLWithPath: bundlePath))
-    print("Started daemon")
+    print("Started daemon", to:&stderr)
     return
   }
 
@@ -48,12 +49,12 @@ func sendCommandToDaemon(workingDirectory: URL, command: String) throws {
   connection.remoteObjectInterface = NSXPCInterface(with: BrokerProtocol.self)
 
   connection.interruptionHandler = {
-    print("Disconnected from broker (interrupted)")
+    print("Disconnected from broker (interrupted)", to:&stderr)
     // TODO: Exit(1)
   };
 
   connection.invalidationHandler = {
-    print("Disconnected from broker (invalidated)")
+    print("Disconnected from broker (invalidated)", to:&stderr)
     // TODO: Exit(1)
   };
 
@@ -63,7 +64,7 @@ func sendCommandToDaemon(workingDirectory: URL, command: String) throws {
   let service = connection.synchronousRemoteObjectProxyWithErrorHandler {
     error in
     logger.error("\(error.localizedDescription, privacy: .public)")
-    print("Received error:", error)
+    print("Received error:", error, to:&stderr)
 
   } as? BrokerProtocol
   logger.debug("Got service protocol")
@@ -88,7 +89,7 @@ struct Quick: ParsableCommand {
   @Flag(name: .shortAndLong, help: .hidden)
   var help: Bool = false
 
-  @Argument(parsing: .unconditionalRemaining, help: ArgumentHelp("Command to execute", valueName: "command"))
+  @Argument(parsing: .unconditionalRemaining, help: ArgumentHelp("Command to execute. If none is given, starts the daemon instead", valueName: "command"))
   var arguments: [String] = []
 
   func validate() throws {
@@ -106,7 +107,7 @@ struct Quick: ParsableCommand {
     if let daemon = findDaemon() {
       if command == "" {
         logger.error("Tried to start daemon when it was already running")
-        print("Daemon is already running")
+        print("Daemon is already running", to:&stderr)
         throw ExitCode(1)
       } else {
         let workingDirectory: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
@@ -116,7 +117,7 @@ struct Quick: ParsableCommand {
       if command == "" {
         try startApplication()
       } else {
-        print("Daemon is not running")
+        print("Daemon is not running", to:&stderr)
         throw ExitCode(1)
       }
     }
