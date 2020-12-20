@@ -5,8 +5,8 @@
   <a href="https://github.com/apple/swift/releases/tag/swift-5.3.2-RELEASE">
     <img src="https://flat.badgen.net/badge/Swift/5.3/orange" alt="Swift Version 5.3" />
   </a>
-  <a href="https://github.com/apple/swift-package-manager/releases/tag/0.6.0">
-    <img src="https://flat.badgen.net/badge/SwiftPM/0.6/orange" alt="SwiftPM Version 0.6" />
+  <a href="https://github.com/AlexGustafsson/quickterm/releases">
+    <img src="https://flat.badgen.net/github/release/AlexGustafsson/quickterm" alt="Latest Release" />
   </a>
   <a href="https://github.com/AlexGustafsson/quickterm/blob/master/Package.swift">
     <img src="https://flat.badgen.net/badge/platform/macOS%20%2011/gray" alt="Platform macOS 11" />
