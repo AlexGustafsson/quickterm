@@ -3,14 +3,7 @@ import SwiftUI
 
 import QuickTermShared
 
-class InputWindowDelegate: NSWindowController, NSWindowDelegate {
-  func windowDidResignKey(_ notification: Notification) {
-    self.window?.close()
-  }
-}
-
 class InputViewController {
-  private let windowDelegate: InputWindowDelegate
   private let window: NSWindow!
 
   typealias ExecuteCallback = (_ command: String) -> ()
@@ -23,8 +16,6 @@ class InputViewController {
   // TODO: Handle "TAB completion" for files etc.
   // TODO: Handle potential completions as text behind input: https://stackoverflow.com/questions/6713391/can-bash-completion-be-invoked-programmatically
   init?() {
-    self.windowDelegate = InputWindowDelegate()
-
     guard let mainScreen = NSScreen.main else {
       logger.error("Unable to find main screen")
       return nil
@@ -47,10 +38,16 @@ class InputViewController {
       defer: false
     )
     self.window.level = .floating
-    self.window.delegate = self.windowDelegate
     self.window.tabbingMode = .disallowed
     self.window.backgroundColor = .clear
     self.window.isOpaque = false
+
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(self.onWindowLostFocus),
+      name: NSWindow.didResignKeyNotification,
+      object: self.window
+    )
 
     var inputView = InputView()
     inputView.onExecuteCommand = {
@@ -63,6 +60,10 @@ class InputViewController {
     self.window.contentView = NSHostingView(rootView: inputView.onExitCommand {
       self.hide()
     })
+  }
+
+  @objc func onWindowLostFocus() {
+    self.hide()
   }
 
   public func show() {
