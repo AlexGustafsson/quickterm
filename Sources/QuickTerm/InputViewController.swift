@@ -4,6 +4,7 @@ import SwiftUI
 import QuickTermShared
 
 class InputViewController {
+  private let inputView: InputView!
   private let window: NSWindow!
 
   typealias ExecuteCallback = (_ command: String) -> ()
@@ -42,24 +43,26 @@ class InputViewController {
     self.window.backgroundColor = .clear
     self.window.isOpaque = false
 
+    self.inputView = InputView()
+    self.inputView.actionProxy.onEnterCallback = {
+      command in
+      logger.debug("Commiting command '\(command, privacy: .public)'")
+      if (command.count > 0) {
+        self.onExecuteCommand(command)
+      }
+      self.hide()
+    }
+    self.inputView.actionProxy.onEscapeCallback = {
+      self.hide()
+    }
+    self.window.contentView = NSHostingView(rootView: self.inputView)
+
     NotificationCenter.default.addObserver(
       self,
       selector: #selector(self.onWindowLostFocus),
       name: NSWindow.didResignKeyNotification,
       object: self.window
     )
-
-    var inputView = InputView()
-    inputView.onExecuteCommand = {
-      command in
-      self.hide()
-      if (command.count > 0) {
-        self.onExecuteCommand(command)
-      }
-    }
-    self.window.contentView = NSHostingView(rootView: inputView.onExitCommand {
-      self.hide()
-    })
   }
 
   @objc func onWindowLostFocus() {
@@ -70,12 +73,13 @@ class InputViewController {
     DispatchQueue.main.async {
       self.window.makeKeyAndOrderFront(nil)
       NSApplication.shared.activate(ignoringOtherApps: true)
-      logger.info("Window can become key? \(self.window.canBecomeKey), \(self.window.canBecomeMain)")
-      logger.info("Window is key? \(self.window.isKeyWindow)")
+      logger.debug("Window can become key? \(self.window.canBecomeKey), \(self.window.canBecomeMain)")
+      logger.debug("Window is key? \(self.window.isKeyWindow)")
     }
   }
 
   public func hide() {
     self.window.orderOut(nil)
+    self.inputView.command = ""
   }
 }
