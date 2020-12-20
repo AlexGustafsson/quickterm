@@ -18,9 +18,9 @@ class NotificationViewController {
 
     self.window = NSWindow(
       contentRect: NSRect(
-        x: mainScreen.visibleFrame.maxX - 345 - 15,
+        x: mainScreen.visibleFrame.maxX - 395,
         y: mainScreen.visibleFrame.minY,
-        width: 345,
+        width: 395,
         height: mainScreen.visibleFrame.height
       ),
       // Toggling between these two lines are useful for debugging the UI

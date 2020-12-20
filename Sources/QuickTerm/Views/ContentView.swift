@@ -7,13 +7,12 @@ struct ContentView: View {
     GeometryReader {
       geometry in
       VStack(spacing: 10) {
-        Spacer().frame(height: 5) // Top offset
         ForEach(sessionManager.items) {
           session in
           NotificationView(session: session)
         }
         Spacer() // Force items up towards the top
-      }.transition(AnyTransition.slide).animation(.default).frame(width: geometry.size.width, height: geometry.size.height) // Force same size as window
+      }.padding(.init(top: 15, leading: 15, bottom: 73, trailing: 5)).transition(AnyTransition.slide).animation(.default).frame(width: geometry.size.width, height: geometry.size.height) // Force same size as window
     }
   }
 }

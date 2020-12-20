@@ -53,9 +53,6 @@ class InputViewController {
     self.window.isOpaque = false
 
     var inputView = InputView()
-    inputView.onExitCommand {
-      self.hide()
-    }
     inputView.onExecuteCommand = {
       command in
       self.hide()
@@ -63,7 +60,9 @@ class InputViewController {
         self.onExecuteCommand(command)
       }
     }
-    self.window.contentView = NSHostingView(rootView: inputView)
+    self.window.contentView = NSHostingView(rootView: inputView.onExitCommand {
+      self.hide()
+    })
   }
 
   public func show() {
