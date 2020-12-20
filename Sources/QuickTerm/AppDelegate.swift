@@ -51,7 +51,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     menu.addItem(NSMenuItem(title: "About \(applicationName)", action: #selector(self.handleAbout), keyEquivalent: ""))
     menu.addItem(NSMenuItem.separator())
-    menu.addItem(NSMenuItem(title: "Show command entry", action: #selector(self.handleCommandEntry), keyEquivalent: "t", keyEquivalentModifierMask: [NSEvent.ModifierFlags.command, NSEvent.ModifierFlags.option]))
+    menu.addItem(NSMenuItem(title: "Show Command Entry", action: #selector(self.handleCommandEntry), keyEquivalent: "t", keyEquivalentModifierMask: [NSEvent.ModifierFlags.command, NSEvent.ModifierFlags.option]))
     menu.addItem(NSMenuItem.separator())
     menu.addItem(
       NSMenuItem(title: "Quit \(applicationName)", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "")
