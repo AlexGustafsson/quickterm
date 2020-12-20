@@ -7,6 +7,9 @@ import QuickTermLibrary
 struct InputView: View {
   @State var command: String = ""
 
+  typealias ExecuteCallback = (_ command: String) -> ()
+  public var onExecuteCommand: ExecuteCallback = { _ in }
+
   var body: some View {
     VStack(alignment: .center) {
       HStack(alignment: .center) {
@@ -36,6 +39,8 @@ struct InputView: View {
 
   func onCommit() {
     logger.info("commit \(self.command)")
+    onExecuteCommand(self.command)
+    self.command = ""
   }
 
   func onEditingChanged(_ changed: Bool) {

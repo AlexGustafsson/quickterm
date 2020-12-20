@@ -13,6 +13,9 @@ class InputViewController {
   private let windowDelegate: InputWindowDelegate
   private let window: NSWindow!
 
+  typealias ExecuteCallback = (_ command: String) -> ()
+  public var onExecuteCommand: ExecuteCallback = { _ in }
+
   // TODO: make movable https://developer.apple.com/library/archive/samplecode/RoundTransparentWindow/Listings/Classes_CustomWindow_m.html#//apple_ref/doc/uid/DTS10000401-Classes_CustomWindow_m-DontLinkElementID_8
   // TODO: save location like Spotlight
   // https://stackoverflow.com/questions/46023769/how-to-show-a-window-without-stealing-focus-on-macos
@@ -49,8 +52,16 @@ class InputViewController {
     self.window.backgroundColor = .clear
     self.window.isOpaque = false
 
-    let inputView = InputView().onExitCommand {
+    var inputView = InputView()
+    inputView.onExitCommand {
       self.hide()
+    }
+    inputView.onExecuteCommand = {
+      command in
+      self.hide()
+      if (command.count > 0) {
+        self.onExecuteCommand(command)
+      }
     }
     self.window.contentView = NSHostingView(rootView: inputView)
   }

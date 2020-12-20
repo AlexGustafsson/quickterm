@@ -121,6 +121,42 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     self.commandEntryHotKey.keyDownHandler = {
       self.handleCommandEntry()
     }
+
+    self.inputViewController.onExecuteCommand = {
+      command in
+      let workingDirectory: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+      let configuration = CommandConfiguration(
+        workingDirectory: workingDirectory,
+        command: command
+      )
+
+      let session = TerminalSession(configuration)
+
+      // TODO: handle delayed start etc.
+
+      // Add the session when started
+      session.onStarted = {
+        _ in
+        DispatchQueue.main.async {
+          self.sessionManager.append(session)
+        }
+      }
+
+      // Remove the session when terminated
+      session.onTerminated = {
+        _ in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+          self.sessionManager.remove(session)
+        }
+      }
+
+      do {
+        logger.info("Starting session")
+        try session.start()
+      } catch {
+        logger.error("Unable to start session: \(error.localizedDescription)")
+      }
+    }
   }
 
   // TODO: When closing the window and
