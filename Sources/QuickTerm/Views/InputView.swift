@@ -22,6 +22,7 @@ struct InputView: View {
           .introspectTextField {
             textField in
             textField.becomeFirstResponder()
+            textField.nextKeyView = nil
           }
       }
       .padding(.init(top: 10, leading: 15, bottom: 10, trailing: 15))
