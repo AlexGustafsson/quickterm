@@ -241,3 +241,7 @@ make package
 # Remove any dynamically created files
 make clean
 ```
+
+### Contributors
+
+Inspired by [qcmd](https://radioaktiv.zone/git/b/qcmd) by [b10rn](https://github.com/b10rn).
