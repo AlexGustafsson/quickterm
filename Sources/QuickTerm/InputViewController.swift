@@ -67,9 +67,7 @@ class InputViewController {
 
   public func show() {
     DispatchQueue.main.async {
-      self.window.makeFirstResponder(nil)
       self.window.makeKeyAndOrderFront(nil)
-      self.window.orderFrontRegardless()
       NSApplication.shared.activate(ignoringOtherApps: true)
       logger.info("Window can become key? \(self.window.canBecomeKey), \(self.window.canBecomeMain)")
       logger.info("Window is key? \(self.window.isKeyWindow)")

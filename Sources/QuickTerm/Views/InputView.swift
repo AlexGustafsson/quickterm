@@ -19,7 +19,10 @@ struct InputView: View {
           .background(Color.clear)
           .textFieldStyle(PlainTextFieldStyle())
           .focusable(onFocusChange: onFocusChange)
-          .introspectTextField {textField in textField.becomeFirstResponder()}
+          .introspectTextField {
+            textField in
+            textField.becomeFirstResponder()
+          }
       }
       .padding(.init(top: 10, leading: 15, bottom: 10, trailing: 15))
       .frame(maxWidth: 680)
