@@ -51,6 +51,7 @@ A global hotkey is also available to easily run commands from anywhere. Simply p
 [Features](#features)<br />
 [Installation](#installation)<br />
 [Usage](#usage)<br />
+[Screenshots](#screenshots)<br />
 [Contributing](#contributing)
 
 <a id="features"></a>
@@ -173,7 +174,7 @@ quick --timeout 5 --animate --shell zsh --dump echo "Hello, World!"
 {"shell":"zsh","animate":true,"timeout":5,"keep":false,"workingDirectory":"file:\/\/\/path\/to\/working\/directory\/","startTime":630156023.25511503,"command":"echo Hello, World!"}
 ```
 
-<a id="contribute"></a>
+<a id="screenshots"></a>
 ## Screenshots
 
 <p align="center">
