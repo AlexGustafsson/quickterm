@@ -71,8 +71,6 @@ func sendCommandToDaemon(_ commandConfiguration: QuickTermShared.CommandConfigur
 
   logger.info("Sending request to execute command")
   service!.queueCommand(commandConfiguration)
-
-  // TODO: Don't run forever, just until the above line succeeds
 }
 
 struct Quick: ParsableCommand {
