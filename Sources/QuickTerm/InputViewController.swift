@@ -4,6 +4,7 @@ import SwiftUI
 import QuickTermShared
 
 class InputViewController {
+  private let commandHistoryManager: CommandHistoryManager
   private var inputView: InputView!
   private let window: BorderlessWindow!
 
@@ -44,7 +45,8 @@ class InputViewController {
     self.window.backgroundColor = .clear
     self.window.isOpaque = false
 
-    self.inputView = InputView(onCommit: onCommit, onCancel: onCancel)
+    self.commandHistoryManager = CommandHistoryManager()
+    self.inputView = InputView(commandHistoryManager: commandHistoryManager, onCommit: onCommit, onCancel: onCancel)
     self.window.contentView = NSHostingView(rootView: self.inputView)
 
     NotificationCenter.default.addObserver(
@@ -63,6 +65,7 @@ class InputViewController {
     logger.debug("Commiting command '\(command, privacy: .public)'")
     if (command.count > 0) {
       self.onExecuteCommand(command)
+      self.commandHistoryManager.append(CommandHistoryItem(command))
     }
     self.hide()
   }

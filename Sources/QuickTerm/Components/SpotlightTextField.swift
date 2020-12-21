@@ -50,6 +50,9 @@ struct SpotlightTextField: NSViewRepresentable {
   let placeholder: String
   @Binding var text: String
   @State var textField: NSTextField? = nil
+  @ObservedObject var commandHistoryManager: CommandHistoryManager
+
+  @State var historyIndex: Int = -1
 
   typealias CommitCallback = (_ text: String) -> ()
   public var onCommit: CommitCallback = { _ in }
@@ -59,9 +62,10 @@ struct SpotlightTextField: NSViewRepresentable {
 
   @State var becomeFirstResponder: Bool = true
 
-  init(_ placeholder: String, text: Binding<String>, onCommit: @escaping CommitCallback, onCancel: @escaping CancelCallback) {
+  init(_ placeholder: String, text: Binding<String>, commandHistoryManager: CommandHistoryManager, onCommit: @escaping CommitCallback, onCancel: @escaping CancelCallback) {
     self.placeholder = placeholder
     self._text = text
+    self.commandHistoryManager = commandHistoryManager
     self.onCommit = onCommit
     self.onCancel = onCancel
   }
@@ -81,6 +85,7 @@ struct SpotlightTextField: NSViewRepresentable {
     textField.allowsEditingTextAttributes = true
     // Disable tabbing to the next view
     textField.nextKeyView = nil
+    self.textField = textField
     return textField
   }
 
@@ -92,8 +97,9 @@ struct SpotlightTextField: NSViewRepresentable {
         textField.becomeFirstResponder()
         // The above line will select all the text if an initial value was set,
         // clear this selection by moving the cursor to the end of the text
-        textField.currentEditor()?.selectedRange = NSMakeRange(textField.stringValue.count, textField.stringValue.count)
+        textField.currentEditor()?.selectedRange = NSMakeRange(self.text.count, 0)
         self.becomeFirstResponder = false
+        logger.debug("Became first responder")
       }
     }
   }
@@ -107,11 +113,30 @@ struct SpotlightTextField: NSViewRepresentable {
   }
 
   func onPreviousInHistory() {
-    self.text = "previous"
+    if self.historyIndex >= self.commandHistoryManager.items.count - 1 {
+      // Do nothing
+    } else {
+      self.historyIndex += 1
+      self.text = self.commandHistoryManager.items[self.commandHistoryManager.items.count - 1 - self.historyIndex].command
+      if let textField = self.textField {
+        textField.currentEditor()?.selectedRange = NSMakeRange(self.text.count, 0)
+      }
+    }
   }
 
   func onNextInHistory() {
-    self.text = "next"
+    if self.historyIndex == -1 {
+      // Do nothing
+    } else if self.historyIndex == 0 {
+      self.historyIndex = -1
+      self.text = ""
+    } else {
+      self.historyIndex -= 1
+      self.text = self.commandHistoryManager.items[self.commandHistoryManager.items.count - 1 - self.historyIndex].command
+      if let textField = self.textField {
+        textField.currentEditor()?.selectedRange = NSMakeRange(self.text.count, 0)
+      }
+    }
   }
 
   class Coordinator: NSObject, NSTextFieldDelegate {
@@ -129,13 +154,15 @@ struct SpotlightTextField: NSViewRepresentable {
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
       if (commandSelector == #selector(NSResponder.insertNewline(_:))) {
         self.parent.onCommit(textView.string)
-        textView.string = ""
+        self.parent.text = ""
+        self.parent.historyIndex = -1
         return true
       } else if (commandSelector == #selector(NSResponder.insertTab(_:))) {
         self.parent.onTab()
         return true
       } else if (commandSelector == #selector(NSResponder.cancelOperation(_:))) {
-        textView.string = ""
+        self.parent.text = ""
+        self.parent.historyIndex = -1
         self.parent.onCancel()
         return true
       } else if commandSelector == NSSelectorFromString("noop:") {

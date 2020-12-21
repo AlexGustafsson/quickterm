@@ -6,6 +6,7 @@ import QuickTermLibrary
 
 struct InputView: View {
   @State var command: String = ""
+  @ObservedObject var commandHistoryManager: CommandHistoryManager
 
   typealias CommitCallback = (_ text: String) -> ()
   var onCommit: CommitCallback = { _ in }
@@ -13,7 +14,8 @@ struct InputView: View {
   typealias CancelCallback = () -> ()
   var onCancel: CancelCallback = {}
 
-  init(onCommit: @escaping CommitCallback, onCancel: @escaping CancelCallback) {
+  init(commandHistoryManager: CommandHistoryManager, onCommit: @escaping CommitCallback, onCancel: @escaping CancelCallback) {
+    self.commandHistoryManager = commandHistoryManager
     self.onCommit = onCommit
     self.onCancel = onCancel
   }
@@ -22,7 +24,7 @@ struct InputView: View {
     VStack(alignment: .center) {
       HStack(alignment: .center) {
         Text(">").font(.custom("FiraMono-Regular", size: 22)).opacity(0.6)
-        SpotlightTextField("Enter command", text: $command, onCommit: onCommit, onCancel: onCancel)
+        SpotlightTextField("Enter command", text: $command, commandHistoryManager: commandHistoryManager, onCommit: onCommit, onCancel: onCancel)
       }
       .padding(.init(top: 10, leading: 15, bottom: 10, trailing: 15))
       .frame(maxWidth: 680)
