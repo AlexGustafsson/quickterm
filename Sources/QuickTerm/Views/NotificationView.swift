@@ -15,7 +15,7 @@ struct NotificationView: View {
     }
     .padding().frame(minWidth: 345, maxWidth: 345, minHeight: 70, maxHeight: 355, alignment: .topLeading)
     .overlay(
-      RoundedRectangle(cornerRadius: 10).stroke(Color.black.opacity(0.1), lineWidth: 1)
+      RoundedRectangle(cornerRadius: 10).stroke(Color.primary.opacity(0.2), lineWidth: 1)
     )
     .background(
       VisualEffectView(

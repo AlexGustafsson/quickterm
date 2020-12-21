@@ -72,7 +72,7 @@ struct InputView: View {
   var body: some View {
     VStack(alignment: .center) {
       HStack(alignment: .center) {
-        Text(">").font(.custom("FiraMono-Regular", size: 22)).foregroundColor(Color.black.opacity(0.5))
+        Text(">").font(.custom("FiraMono-Regular", size: 22)).opacity(0.6)
         TextField("Enter command", text: $command, onEditingChanged: onEditingChanged(_:))
           .font(.custom("FiraMono-Regular", size: 22))
           .background(Color.clear)
@@ -95,7 +95,7 @@ struct InputView: View {
       .padding(.init(top: 10, leading: 15, bottom: 10, trailing: 15))
       .frame(maxWidth: 680)
       .overlay(
-        RoundedRectangle(cornerRadius: 10).stroke(Color.black.opacity(0.1), lineWidth: 1)
+        RoundedRectangle(cornerRadius: 10).stroke(Color.primary.opacity(0.2), lineWidth: 1)
       )
       .background(
         VisualEffectView(
