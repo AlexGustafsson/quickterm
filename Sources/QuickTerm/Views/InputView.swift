@@ -17,6 +17,12 @@ class NSTextFieldActionProxy: NSObject, NSTextFieldDelegate {
   typealias SelectAllCallback = () -> ()
   public var onSelectAllCallback: SelectAllCallback = {}
 
+  typealias MoveUpCallback = () -> ()
+  public var onMoveUpCallback: MoveUpCallback = {}
+
+  typealias MoveDownCallback = () -> ()
+  public var onMoveDownCallback: MoveDownCallback = {}
+
   weak var proxyDelegate: NSTextFieldDelegate?
 
   override func responds(to aSelector: Selector!) -> Bool {
@@ -49,6 +55,12 @@ class NSTextFieldActionProxy: NSObject, NSTextFieldDelegate {
       // was actually "select all"
       self.onSelectAllCallback()
       return true
+    } else if commandSelector == #selector(NSResponder.moveUp(_:)) {
+      self.onMoveUpCallback()
+      return true
+    } else if commandSelector == #selector(NSResponder.moveDown(_:)) {
+      self.onMoveDownCallback()
+      return true
     }
 
     logger.debug("Passing selector: \(commandSelector, privacy: .public)")
@@ -68,6 +80,11 @@ struct InputView: View {
   @State var command: String = ""
 
   public let actionProxy: NSTextFieldActionProxy! = NSTextFieldActionProxy()
+
+  init() {
+      self.actionProxy.onMoveUpCallback = self.previousHistoryItem
+      self.actionProxy.onMoveDownCallback = self.nextHistoryItem
+  }
 
   var body: some View {
     VStack(alignment: .center) {
@@ -110,5 +127,15 @@ struct InputView: View {
 
   func onEditingChanged(_ changed: Bool) {
     logger.debug("Changed? \(changed, privacy: .public):  \(self.command, privacy: .public)")
+  }
+
+  func nextHistoryItem() {
+    command = "history"
+    logger.debug("Next history item")
+  }
+
+  func previousHistoryItem() {
+    command = "previous history"
+    logger.debug("Previous history item")
   }
 }
