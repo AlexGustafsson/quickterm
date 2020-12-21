@@ -73,7 +73,7 @@ struct InputView: View {
     VStack(alignment: .center) {
       HStack(alignment: .center) {
         Text(">").font(.custom("FiraMono-Regular", size: 22)).opacity(0.6)
-        TextField("Enter command", text: $command, onEditingChanged: onEditingChanged(_:))
+        TextField("", text: $command, onEditingChanged: onEditingChanged(_:))
           .font(.custom("FiraMono-Regular", size: 22))
           .background(Color.clear)
           .textFieldStyle(PlainTextFieldStyle())

@@ -5,7 +5,7 @@ import QuickTermShared
 
 class InputViewController {
   private let inputView: InputView!
-  private let window: NSWindow!
+  private let window: BorderlessWindow!
 
   typealias ExecuteCallback = (_ command: String) -> ()
   public var onExecuteCommand: ExecuteCallback = { _ in }
@@ -38,6 +38,7 @@ class InputViewController {
       backing: .buffered,
       defer: false
     )
+    self.window.canMove = true
     self.window.level = .floating
     self.window.tabbingMode = .disallowed
     self.window.backgroundColor = .clear
