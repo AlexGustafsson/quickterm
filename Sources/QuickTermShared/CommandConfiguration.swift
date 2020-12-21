@@ -20,6 +20,8 @@ import Foundation
 	public let startTime: Date
 	// Whether or not to animate the output.
 	public let animate: Bool
+	// Whether or not to wait for the command to exit before presenting the view
+	public let waitForExit: Bool
 
 	public func encode(with encoder: NSCoder){
 		encoder.encode(self.workingDirectory as NSURL, forKey: "workingDirectory")
@@ -29,6 +31,7 @@ import Foundation
 		encoder.encode(self.keep, forKey: "keep")
 		encoder.encode(self.startTime as NSDate, forKey: "startTime")
 		encoder.encode(self.animate, forKey: "animate")
+		encoder.encode(self.waitForExit, forKey: "waitForExit")
 	}
 
 	public required init?(coder decoder: NSCoder) {
@@ -39,7 +42,8 @@ import Foundation
 			let timeout = decoder.decodeDouble(forKey: "timeout") as Double?,
 			let keep = decoder.decodeBool(forKey: "keep") as Bool?,
 			let startTime = decoder.decodeObject(of: NSDate.self, forKey: "startTime") as Date?,
-			let animate = decoder.decodeBool(forKey: "animate") as Bool?
+			let animate = decoder.decodeBool(forKey: "animate") as Bool?,
+			let waitForExit = decoder.decodeBool(forKey: "waitForExit") as Bool?
 		else {
       return nil
     }
@@ -51,6 +55,7 @@ import Foundation
 		self.keep = keep
 		self.startTime = startTime
 		self.animate = animate
+		self.waitForExit = waitForExit
 	}
 
 	public init(
@@ -60,7 +65,8 @@ import Foundation
 			timeout: Double = 5,
 			keep: Bool = false,
 			startTime: Date? = nil,
-			animate: Bool = false
+			animate: Bool = false,
+			waitForExit: Bool = false
 	) {
 		self.workingDirectory = workingDirectory
 		self.command = command
@@ -69,6 +75,7 @@ import Foundation
 		self.keep = keep
 		self.startTime = startTime ?? Date()
 		self.animate = animate
+		self.waitForExit = waitForExit
 	}
 
 	public func dump(pretty: Bool = false) throws -> String {

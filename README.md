@@ -144,18 +144,19 @@ The CLI enables you to easily offload commands to QuickTerm. For example, you ma
 To get started with the CLI, run `quick --help` to see the available functions.
 
 ```
-OVERVIEW: Run a command in a seperate window
+OVERVIEW: Run a command in a separate window
 
-USAGE: quick [--animate] [--shell <shell>] [--timeout <timeout>] [--keep] [--dump] [<command> ...]
+USAGE: quick [--animate] [--shell <shell>] [--timeout <timeout>] [--keep] [--wait-for-exit] [--dump] [<command> ...]
 
 ARGUMENTS:
   <command>               Command to execute. If none is given, starts the daemon instead
 
 OPTIONS:
-  --animate               Whether or not the output should be animated
+  --animate               Whether or not the output should be animated as it's received. Does not work with --wait-for-exit as the output is fully available when shown
   --shell <shell>         The shell to use (default: bash)
   --timeout <timeout>     The number of seconds to wait before terminating the command (default: 5.0)
   --keep                  Whether or not the window should stay until the command finishes or is closed
+  --wait-for-exit         Whether or not to wait for the command to exit before presenting the view
   --dump                  Dump the command configuration as JSON. Will be used if the command is to be ran
   -h, --help              Show help information.
 ```

@@ -73,14 +73,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       // Add the session when started
       session.onStarted = {
         _ in
-        DispatchQueue.main.async {
-          self.sessionManager.append(session)
+        if !session.configuration.waitForExit {
+          DispatchQueue.main.async {
+            self.sessionManager.append(session)
+          }
         }
       }
 
       // Remove the session when terminated
       session.onTerminated = {
         _ in
+        if session.configuration.waitForExit {
+          DispatchQueue.main.async {
+            self.sessionManager.append(session)
+          }
+        }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
           self.sessionManager.remove(session)
         }

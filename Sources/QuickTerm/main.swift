@@ -76,9 +76,9 @@ func sendCommandToDaemon(_ commandConfiguration: QuickTermShared.CommandConfigur
 }
 
 struct Quick: ParsableCommand {
-  static let configuration = CommandConfiguration(abstract: "Run a command in a seperate window")
+  static let configuration = CommandConfiguration(abstract: "Run a command in a separate window")
 
-  @Flag(help: "Whether or not the output should be animated")
+  @Flag(help: "Whether or not the output should be animated as it's received. Does not work with --wait-for-exit as the output is fully available when shown")
   var animate: Bool = false
 
   @Option(help: "The shell to use")
@@ -90,8 +90,12 @@ struct Quick: ParsableCommand {
   @Flag(help: "Whether or not the window should stay until the command finishes or is closed")
   var keep: Bool = false
 
+  @Flag(help: "Whether or not to wait for the command to exit before presenting the view")
+  var waitForExit: Bool = false
+
   @Flag(help: "Dump the command configuration as JSON. Will be used if the command is to be ran")
   var dump: Bool = false
+
 
   // Add an explicit help flag so that the help flag works even though
   // uncoditional remaining parsing is used for the arguments below
@@ -126,7 +130,8 @@ struct Quick: ParsableCommand {
           shell: shell,
           timeout: timeout,
           keep: keep,
-          animate: animate
+          animate: animate,
+          waitForExit: waitForExit
         )
         if dump {
           let json = try commandConfiguration.dump()
