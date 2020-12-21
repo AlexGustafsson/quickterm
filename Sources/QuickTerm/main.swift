@@ -94,6 +94,9 @@ struct Quick: ParsableCommand {
   @Flag(help: "Dump the command configuration as JSON. Will be used if the command is to be ran")
   var dump: Bool = false
 
+  @Flag(help: "Don't source `~/.bash_profile` before executing the command. Applicable only when using Bash as shell")
+  var noBashProfile: Bool = false
+
 
   // Add an explicit help flag so that the help flag works even though
   // uncoditional remaining parsing is used for the arguments below
@@ -129,7 +132,8 @@ struct Quick: ParsableCommand {
           timeout: timeout,
           keep: keep,
           animate: animate,
-          waitForExit: waitForExit
+          waitForExit: waitForExit,
+          sourceBashProfile: !noBashProfile
         )
         if dump {
           let json = try commandConfiguration.dump()

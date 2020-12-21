@@ -146,7 +146,7 @@ To get started with the CLI, run `quick --help` to see the available functions.
 ```
 OVERVIEW: Run a command in a separate window
 
-USAGE: quick [--animate] [--shell <shell>] [--timeout <timeout>] [--keep] [--wait-for-exit] [--dump] [<command> ...]
+USAGE: quick [--animate] [--shell <shell>] [--timeout <timeout>] [--keep] [--wait-for-exit] [--dump] [--no-bash-profile] [<command> ...]
 
 ARGUMENTS:
   <command>               Command to execute. If none is given, starts the daemon instead
@@ -158,6 +158,7 @@ OPTIONS:
   --keep                  Whether or not the window should stay until the command finishes or is closed
   --wait-for-exit         Whether or not to wait for the command to exit before presenting the view
   --dump                  Dump the command configuration as JSON. Will be used if the command is to be ran
+  --no-bash-profile       Don't source `~/.bash_profile` before executing the command. Applicable only when using Bash as shell
   -h, --help              Show help information.
 ```
 

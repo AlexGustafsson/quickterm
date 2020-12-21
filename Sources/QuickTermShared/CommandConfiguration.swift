@@ -22,6 +22,9 @@ import Foundation
 	public let animate: Bool
 	// Whether or not to wait for the command to exit before presenting the view
 	public let waitForExit: Bool
+	// Whether or not to source `~/.bash_profile` before executing the command
+	// Applicable only when using Bash as shell
+	public let sourceBashProfile: Bool
 
 	public func encode(with encoder: NSCoder){
 		encoder.encode(self.workingDirectory as NSURL, forKey: "workingDirectory")
@@ -32,6 +35,7 @@ import Foundation
 		encoder.encode(self.startTime as NSDate, forKey: "startTime")
 		encoder.encode(self.animate, forKey: "animate")
 		encoder.encode(self.waitForExit, forKey: "waitForExit")
+		encoder.encode(self.sourceBashProfile, forKey: "sourceBashProfile")
 	}
 
 	public required init?(coder decoder: NSCoder) {
@@ -43,7 +47,8 @@ import Foundation
 			let keep = decoder.decodeBool(forKey: "keep") as Bool?,
 			let startTime = decoder.decodeObject(of: NSDate.self, forKey: "startTime") as Date?,
 			let animate = decoder.decodeBool(forKey: "animate") as Bool?,
-			let waitForExit = decoder.decodeBool(forKey: "waitForExit") as Bool?
+			let waitForExit = decoder.decodeBool(forKey: "waitForExit") as Bool?,
+			let sourceBashProfile = decoder.decodeBool(forKey: "sourceBashProfile") as Bool?
 		else {
       return nil
     }
@@ -56,6 +61,7 @@ import Foundation
 		self.startTime = startTime
 		self.animate = animate
 		self.waitForExit = waitForExit
+		self.sourceBashProfile = sourceBashProfile
 	}
 
 	public init(
@@ -66,7 +72,8 @@ import Foundation
 			keep: Bool = false,
 			startTime: Date? = nil,
 			animate: Bool = false,
-			waitForExit: Bool = false
+			waitForExit: Bool = false,
+			sourceBashProfile: Bool = true
 	) {
 		self.workingDirectory = workingDirectory
 		self.command = command
@@ -76,6 +83,7 @@ import Foundation
 		self.startTime = startTime ?? Date()
 		self.animate = animate
 		self.waitForExit = waitForExit
+		self.sourceBashProfile = sourceBashProfile
 	}
 
 	public func dump(pretty: Bool = false) throws -> String {
