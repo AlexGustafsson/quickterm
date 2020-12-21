@@ -4,7 +4,7 @@ import SwiftUI
 import QuickTermShared
 
 class InputViewController {
-  private let inputView: InputView!
+  private var inputView: InputView!
   private let window: BorderlessWindow!
 
   typealias ExecuteCallback = (_ command: String) -> ()
@@ -44,18 +44,7 @@ class InputViewController {
     self.window.backgroundColor = .clear
     self.window.isOpaque = false
 
-    self.inputView = InputView()
-    self.inputView.actionProxy.onEnterCallback = {
-      command in
-      logger.debug("Commiting command '\(command, privacy: .public)'")
-      if (command.count > 0) {
-        self.onExecuteCommand(command)
-      }
-      self.hide()
-    }
-    self.inputView.actionProxy.onEscapeCallback = {
-      self.hide()
-    }
+    self.inputView = InputView(onCommit: onCommit, onCancel: onCancel)
     self.window.contentView = NSHostingView(rootView: self.inputView)
 
     NotificationCenter.default.addObserver(
@@ -67,6 +56,18 @@ class InputViewController {
   }
 
   @objc func onWindowLostFocus() {
+    self.hide()
+  }
+
+  func onCommit(command: String) {
+    logger.debug("Commiting command '\(command, privacy: .public)'")
+    if (command.count > 0) {
+      self.onExecuteCommand(command)
+    }
+    self.hide()
+  }
+
+  func onCancel() {
     self.hide()
   }
 
