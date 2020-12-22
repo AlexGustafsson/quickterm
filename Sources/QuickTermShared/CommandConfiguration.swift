@@ -25,6 +25,9 @@ import Foundation
 	// Whether or not to source `~/.bash_profile` before executing the command
 	// Applicable only when using Bash as shell
 	public let sourceBashProfile: Bool
+	// The number of seconds to wait after exit before closing the notification
+	// Not used if keep is true
+	public let delayAfterExit: Double
 
 	public func encode(with encoder: NSCoder){
 		encoder.encode(self.workingDirectory as NSURL, forKey: "workingDirectory")
@@ -36,6 +39,7 @@ import Foundation
 		encoder.encode(self.animate, forKey: "animate")
 		encoder.encode(self.waitForExit, forKey: "waitForExit")
 		encoder.encode(self.sourceBashProfile, forKey: "sourceBashProfile")
+		encoder.encode(self.delayAfterExit, forKey: "delayAfterExit")
 	}
 
 	public required init?(coder decoder: NSCoder) {
@@ -48,7 +52,8 @@ import Foundation
 			let startTime = decoder.decodeObject(of: NSDate.self, forKey: "startTime") as Date?,
 			let animate = decoder.decodeBool(forKey: "animate") as Bool?,
 			let waitForExit = decoder.decodeBool(forKey: "waitForExit") as Bool?,
-			let sourceBashProfile = decoder.decodeBool(forKey: "sourceBashProfile") as Bool?
+			let sourceBashProfile = decoder.decodeBool(forKey: "sourceBashProfile") as Bool?,
+			let delayAfterExit = decoder.decodeDouble(forKey: "delayAfterExit") as Double?
 		else {
       return nil
     }
@@ -62,6 +67,7 @@ import Foundation
 		self.animate = animate
 		self.waitForExit = waitForExit
 		self.sourceBashProfile = sourceBashProfile
+		self.delayAfterExit = delayAfterExit
 	}
 
 	public init(
@@ -73,7 +79,8 @@ import Foundation
 			startTime: Date? = nil,
 			animate: Bool = false,
 			waitForExit: Bool = false,
-			sourceBashProfile: Bool = true
+			sourceBashProfile: Bool = true,
+			delayAfterExit: Double = 3
 	) {
 		self.workingDirectory = workingDirectory
 		self.command = command
@@ -84,6 +91,7 @@ import Foundation
 		self.animate = animate
 		self.waitForExit = waitForExit
 		self.sourceBashProfile = sourceBashProfile
+		self.delayAfterExit = delayAfterExit
 	}
 
 	public func dump(pretty: Bool = false) throws -> String {

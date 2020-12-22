@@ -3,34 +3,18 @@ import os
 
 import QuickTermShared
 
-class TerminalSessionManager: ObservableObject {
-  @Published var items: [TerminalSession] = []
-
-  func append(_ session: TerminalSession) {
-    objectWillChange.send()
-    self.items.append(session)
-  }
-
-  func remove(_ session: TerminalSession) {
-    objectWillChange.send()
-    if let index = self.items.firstIndex(of: session) {
-      self.items.remove(at: index)
-    }
-  }
-}
-
 class TerminalSession: Identifiable, ObservableObject, Equatable {
-  typealias TerminatedCallback = (TerminalSession) -> ()
-	var onTerminated: TerminatedCallback = { _ in }
-
-  typealias StartedCallback = (TerminalSession) -> ()
-	var onStarted: StartedCallback = { _ in }
+  typealias ActiveChangedCallback = (TerminalSession) -> ()
+	var onActiveChanged: ActiveChangedCallback = { _ in }
 
   @Published private(set) var isRunning: Bool = false
   @Published private(set) var hasFinished: Bool = false
   @Published private(set) var exitCode: Int32? = nil
   /// Valid once hasFinished is true
   @Published private(set) var wasSuccessful: Bool = false
+  // Whether or not the session is invalidated. That is, if it is no longer in
+  // use (process has exited, delay has been passed and so on)
+  @Published private(set) var isActive: Bool = false
 
   public let id = UUID()
 
@@ -84,7 +68,21 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
         self.onTermination()
       }
       try self.process.run()
-      self.onStarted(self)
+      if !self.configuration.waitForExit {
+        self.isActive = true
+        self.onActiveChanged(self)
+      }
+      self.onActiveChanged(self)
+      DispatchQueue.main.asyncAfter(deadline: .now() + self.configuration.timeout) {
+        self.terminate()
+      }
+    }
+  }
+
+  public func terminate() {
+    if self.isRunning {
+      logger.info("Terminating session \(self.id, privacy: .public)")
+      self.process.terminate()
     }
   }
 
@@ -104,12 +102,20 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
 
   @objc private func onTermination() {
     logger.info("Process exited with code \(self.process.terminationStatus, privacy: .public)")
-    logger.debug("Removing termination observer")
     self.exitCode = self.process.terminationStatus
     self.wasSuccessful = self.exitCode == 0
     self.hasFinished = true
     self.isRunning = false
-    self.onTerminated(self)
+    if self.configuration.waitForExit {
+      self.isActive = true
+      self.onActiveChanged(self)
+    }
+    DispatchQueue.main.asyncAfter(deadline: .now() + self.configuration.delayAfterExit) {
+      logger.info("Session \(self.id, privacy: .public) invalidated")
+      self.objectWillChange.send()
+      self.isActive = false
+      self.onActiveChanged(self)
+    }
   }
 
   static func ==(lhs: TerminalSession, rhs: TerminalSession) -> Bool {

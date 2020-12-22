@@ -61,42 +61,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     executor.onExecuteCommand = {
       configuration in
-      if let json = try? configuration.dump() {
-        logger.info("Received command to execute in \(configuration.workingDirectory, privacy: .public): \(json, privacy: .public)")
-      } else {
-        logger.info("Received command to execute in \(configuration.workingDirectory, privacy: .public): \(configuration.command)")
-      }
       let session = TerminalSession(configuration)
-
-      // Add the session when started
-      session.onStarted = {
-        _ in
-        if !session.configuration.waitForExit {
-          DispatchQueue.main.async {
-            self.sessionManager.append(session)
-          }
-        }
-      }
-
-      // Remove the session when terminated
-      session.onTerminated = {
-        _ in
-        if session.configuration.waitForExit {
-          DispatchQueue.main.async {
-            self.sessionManager.append(session)
-          }
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-          self.sessionManager.remove(session)
-        }
-      }
-
-      do {
-        logger.info("Starting session")
-        try session.start()
-      } catch {
-        logger.error("Unable to start session: \(error.localizedDescription)")
-      }
+      self.sessionManager.schedule(session)
     }
 
     self.connection.interruptionHandler = {
@@ -132,31 +98,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         workingDirectory: workingDirectory,
         command: command
       )
-
       let session = TerminalSession(configuration)
-
-      // Add the session when started
-      session.onStarted = {
-        _ in
-        DispatchQueue.main.async {
-          self.sessionManager.append(session)
-        }
-      }
-
-      // Remove the session when terminated
-      session.onTerminated = {
-        _ in
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-          self.sessionManager.remove(session)
-        }
-      }
-
-      do {
-        logger.info("Starting session")
-        try session.start()
-      } catch {
-        logger.error("Unable to start session: \(error.localizedDescription)")
-      }
+      self.sessionManager.schedule(session)
     }
   }
 
