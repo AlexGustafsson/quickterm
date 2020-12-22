@@ -21,11 +21,16 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
 
   private let process: Process!
 
-  private let stdout: Pipe!
-  private let outHandle: FileHandle!
+  private var stdout: Pipe!
+  private var stdoutHandle: FileHandle!
+
+  private var stderr: Pipe!
+  private var stderrHandle: FileHandle!
 
   public let configuration: CommandConfiguration!
+  @Published public var output = ""
   @Published public var stdoutOutput = ""
+  @Published public var stderrOutput = ""
 
   init(_ configuration: CommandConfiguration) {
     self.configuration = configuration
@@ -46,17 +51,33 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
     logger.debug("Creating stdout pipe")
     self.stdout = Pipe()
     self.process.standardOutput = stdout
-    self.outHandle = stdout.fileHandleForReading
+    self.stdoutHandle = stdout.fileHandleForReading
     DispatchQueue.main.async {
-      self.outHandle.waitForDataInBackgroundAndNotify()
+      self.stdoutHandle.waitForDataInBackgroundAndNotify()
     }
 
     logger.debug("Creating stdout observer")
     NotificationCenter.default.addObserver(
       self,
-      selector: #selector(self.onDataAvailable),
+      selector: #selector(self.onStdoutDataAvailable),
       name: .NSFileHandleDataAvailable,
-      object: self.outHandle
+      object: self.stdoutHandle
+    )
+
+    logger.debug("Creating stderr pipe")
+    self.stderr = Pipe()
+    self.process.standardError = stderr
+    self.stderrHandle = stderr.fileHandleForReading
+    DispatchQueue.main.async {
+      self.stderrHandle.waitForDataInBackgroundAndNotify()
+    }
+
+    logger.debug("Creating stderr observer")
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(self.onStderrDataAvailable),
+      name: .NSFileHandleDataAvailable,
+      object: self.stderrHandle
     )
   }
 
@@ -86,15 +107,31 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
     }
   }
 
-  @objc private func onDataAvailable() {
-    let data = self.outHandle.availableData
+  @objc private func onStdoutDataAvailable() {
+    let data = self.stdoutHandle.availableData
 
     if data.count > 0 {
       if let output = String(data: data, encoding: String.Encoding.utf8) {
         logger.debug("Got output data \(output)")
         self.stdoutOutput += output
+        self.output += output
       }
-      outHandle.waitForDataInBackgroundAndNotify()
+      stdoutHandle.waitForDataInBackgroundAndNotify()
+    } else {
+      logger.debug("Received EOF")
+    }
+  }
+
+  @objc private func onStderrDataAvailable() {
+    let data = self.stderrHandle.availableData
+
+    if data.count > 0 {
+      if let output = String(data: data, encoding: String.Encoding.utf8) {
+        logger.debug("Got output data \(output)")
+        self.stderrOutput += output
+        self.output += output
+      }
+      stderrHandle.waitForDataInBackgroundAndNotify()
     } else {
       logger.debug("Received EOF")
     }
