@@ -26,6 +26,7 @@ class ExplicitFontTextFieldCell: NSTextFieldCell {
 // no matter how it is set...
 class ExplicitFontTextField: NSTextField {
   private let commandKey = NSEvent.ModifierFlags.command.rawValue
+  private let controlKey = NSEvent.ModifierFlags.control.rawValue
   private let commandShiftKey = NSEvent.ModifierFlags.command.rawValue | NSEvent.ModifierFlags.shift.rawValue
 
   override class var cellClass: AnyClass? {
@@ -69,6 +70,10 @@ class ExplicitFontTextField: NSTextField {
         if event.charactersIgnoringModifiers == "Z" {
           if NSApp.sendAction(Selector(("redo:")), to: nil, from: self) { return true }
         }
+      } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue) == controlKey {
+        // Like ctrl+c in a terminal - abort the command entry
+        self.stringValue = ""
+        return true
       }
     }
     return super.performKeyEquivalent(with: event)
