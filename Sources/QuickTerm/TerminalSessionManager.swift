@@ -17,9 +17,6 @@ class TerminalSessionManager: ObservableObject {
     DispatchQueue.main.asyncAfter(deadline: .now() + secondsToStart) {
       self.startSession(session)
     }
-
-    objectWillChange.send()
-    self.sessions.append(session)
   }
 
   private func startSession(_ session: TerminalSession) {
@@ -33,7 +30,10 @@ class TerminalSessionManager: ObservableObject {
 
   private func sessionActiveChanged(_ session: TerminalSession) {
     objectWillChange.send()
-    if !session.isActive {
+    if session.isActive {
+      objectWillChange.send()
+      self.sessions.append(session)
+    } else {
       if self.shouldRemove {
         self.remove(session)
       } else {

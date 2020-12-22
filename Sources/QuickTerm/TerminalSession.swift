@@ -73,7 +73,6 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
         self.isActive = true
         self.onActiveChanged(self)
       }
-      self.onActiveChanged(self)
       DispatchQueue.main.asyncAfter(deadline: .now() + self.configuration.timeout) {
         self.terminate()
       }
