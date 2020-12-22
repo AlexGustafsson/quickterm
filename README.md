@@ -65,6 +65,9 @@ A global hotkey is also available to easily run commands from anywhere. Simply p
 * Uses virtually zero resources
 * Native application written in Swift 5 and SwiftUI
 * Per-command configurations via CLI
+* Automatic dark mode
+* Spotlight-like input with command history
+* Tab-completion and auto complete (upcoming)
 
 <a id="installation"></a>
 ## Installation
