@@ -10,9 +10,7 @@ struct ContentView: View {
         ForEach(sessionManager.sessions, id: \.id) {
           session in
           Group {
-            if session.isActive {
-              NotificationView(session: session)
-            }
+            NotificationView(session: session)
           }
         }
         Spacer() // Force items up towards the top

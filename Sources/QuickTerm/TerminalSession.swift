@@ -15,6 +15,7 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
   // Whether or not the session is invalidated. That is, if it is no longer in
   // use (process has exited, delay has been passed and so on)
   @Published private(set) var isActive: Bool = false
+  @Published private(set) var exitTime: Date? = nil
 
   public let id = UUID()
 
@@ -110,6 +111,7 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
       self.isActive = true
       self.onActiveChanged(self)
     }
+    self.exitTime = Date()
     DispatchQueue.main.asyncAfter(deadline: .now() + self.configuration.delayAfterExit) {
       logger.info("Session \(self.id, privacy: .public) invalidated")
       self.objectWillChange.send()
