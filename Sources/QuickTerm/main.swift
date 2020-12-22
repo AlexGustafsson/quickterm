@@ -95,6 +95,8 @@ struct Quick: ParsableCommand {
   @Flag(help: "Don't source `~/.bash_profile` before executing the command. Applicable only when using Bash as shell")
   var noBashProfile: Bool = false
 
+  @Option(help: "The number of seconds to wait after exit before closing the notification. Not used if keep is true")
+  var delayAfterExit: Double = 3
 
   // Add an explicit help flag so that the help flag works even though
   // uncoditional remaining parsing is used for the arguments below
@@ -111,6 +113,10 @@ struct Quick: ParsableCommand {
 
     guard timeout >= 0 else {
       throw ValidationError("'timeout' must be larger than or equal to 0")
+    }
+
+    guard delayAfterExit >= 0 else {
+      throw ValidationError("'delay-after-exit' must be larger than or equal to 0")
     }
   }
 
@@ -131,7 +137,8 @@ struct Quick: ParsableCommand {
           keep: keep,
           animate: animate,
           waitForExit: waitForExit,
-          sourceBashProfile: !noBashProfile
+          sourceBashProfile: !noBashProfile,
+          delayAfterExit: delayAfterExit
         )
         if dump {
           let json = try commandConfiguration.dump()
