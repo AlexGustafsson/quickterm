@@ -26,7 +26,7 @@ public struct Queue<T> {
     array[head] = nil
     head += 1
 
-    let percentage = Double(head)/Double(array.count)
+    let percentage = Double(head) / Double(array.count)
     if array.count > 50 && percentage > 0.25 {
       array.removeFirst(head)
       head = 0
@@ -45,10 +45,10 @@ public struct Queue<T> {
 }
 
 extension Array {
-    subscript(guarded idx: Int) -> Element? {
-        guard (startIndex..<endIndex).contains(idx) else {
-            return nil
-        }
-        return self[idx]
+  subscript(guarded idx: Int) -> Element? {
+    guard (startIndex..<endIndex).contains(idx) else {
+      return nil
     }
+    return self[idx]
+  }
 }

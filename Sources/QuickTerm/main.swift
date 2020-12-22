@@ -1,9 +1,8 @@
 import AppKit
 import ArgumentParser
 import Foundation
-import os
-
 import QuickTermShared
+import os
 
 let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "main")
 var stderr = FileHandle.standardError
@@ -27,7 +26,7 @@ func startApplication() throws {
   if isInTTY {
     let bundlePath = Bundle.main.bundlePath
     NSWorkspace.shared.open(URL(fileURLWithPath: bundlePath))
-    print("Started daemon", to:&stderr)
+    print("Started daemon", to: &stderr)
     return
   }
 
@@ -49,22 +48,23 @@ func sendCommandToDaemon(_ commandConfiguration: QuickTermShared.CommandConfigur
   connection.remoteObjectInterface = NSXPCInterface(with: BrokerProtocol.self)
 
   connection.interruptionHandler = {
-    print("Disconnected from broker (interrupted)", to:&stderr)
-  };
+    print("Disconnected from broker (interrupted)", to: &stderr)
+  }
 
   connection.invalidationHandler = {
-    print("Disconnected from broker (invalidated)", to:&stderr)
-  };
+    print("Disconnected from broker (invalidated)", to: &stderr)
+  }
 
   connection.resume()
   logger.debug("Connected to broker")
 
-  let service = connection.synchronousRemoteObjectProxyWithErrorHandler {
-    error in
-    logger.error("\(error.localizedDescription, privacy: .public)")
-    print("Received error:", error, to:&stderr)
+  let service =
+    connection.synchronousRemoteObjectProxyWithErrorHandler {
+      error in
+      logger.error("\(error.localizedDescription, privacy: .public)")
+      print("Received error:", error, to: &stderr)
 
-  } as? BrokerProtocol
+    } as? BrokerProtocol
   logger.debug("Got service protocol")
 
   logger.info("Sending request to execute command")
@@ -74,7 +74,10 @@ func sendCommandToDaemon(_ commandConfiguration: QuickTermShared.CommandConfigur
 struct Quick: ParsableCommand {
   static let configuration = CommandConfiguration(abstract: "Run a command in a separate window")
 
-  @Flag(help: "Whether or not the output should be animated as it's received. Does not work with --wait-for-exit as the output is fully available when shown")
+  @Flag(
+    help:
+      "Whether or not the output should be animated as it's received. Does not work with --wait-for-exit as the output is fully available when shown"
+  )
   var animate: Bool = false
 
   @Option(help: "The shell to use")
@@ -103,7 +106,10 @@ struct Quick: ParsableCommand {
   @Flag(name: .shortAndLong, help: .hidden)
   var help: Bool = false
 
-  @Argument(parsing: .unconditionalRemaining, help: ArgumentHelp("Command to execute. If none is given, starts the daemon instead", valueName: "command"))
+  @Argument(
+    parsing: .unconditionalRemaining,
+    help: ArgumentHelp("Command to execute. If none is given, starts the daemon instead", valueName: "command")
+  )
   var arguments: [String] = []
 
   func validate() throws {
@@ -125,7 +131,7 @@ struct Quick: ParsableCommand {
     if let daemon = findDaemon() {
       if command == "" {
         logger.error("Tried to start daemon when it was already running")
-        print("Daemon is already running", to:&stderr)
+        print("Daemon is already running", to: &stderr)
         throw ExitCode(1)
       } else {
         let workingDirectory: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
@@ -151,7 +157,7 @@ struct Quick: ParsableCommand {
       if command == "" {
         try startApplication()
       } else {
-        print("Daemon is not running", to:&stderr)
+        print("Daemon is not running", to: &stderr)
         throw ExitCode(1)
       }
     }

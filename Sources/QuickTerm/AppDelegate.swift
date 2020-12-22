@@ -1,8 +1,7 @@
 import AppKit
-import SwiftUI
-
-import QuickTermShared
 import HotKey
+import QuickTermShared
+import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
   private let notificationViewController: NotificationViewController!
@@ -33,7 +32,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     self.executor = CommandExecutor()
 
     self.delegate = CommandExecutorDelegate(executor: executor)
-    self.listener.delegate = self.delegate;
+    self.listener.delegate = self.delegate
 
     self.commandEntryHotKey = HotKey(key: .t, modifiers: [.command, .option])
   }
@@ -51,7 +50,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     menu.addItem(NSMenuItem(title: "About \(applicationName)", action: #selector(self.handleAbout), keyEquivalent: ""))
     menu.addItem(NSMenuItem.separator())
-    menu.addItem(NSMenuItem(title: "Show Command Entry", action: #selector(self.handleCommandEntry), keyEquivalent: "t", keyEquivalentModifierMask: [NSEvent.ModifierFlags.command, NSEvent.ModifierFlags.option]))
+    menu.addItem(
+      NSMenuItem(
+        title: "Show Command Entry",
+        action: #selector(self.handleCommandEntry),
+        keyEquivalent: "t",
+        keyEquivalentModifierMask: [NSEvent.ModifierFlags.command, NSEvent.ModifierFlags.option]
+      )
+    )
     menu.addItem(NSMenuItem.separator())
     menu.addItem(
       NSMenuItem(title: "Quit \(applicationName)", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "")
@@ -67,20 +73,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     self.connection.interruptionHandler = {
       logger.info("Disconnected from broker (interrupted)")
-    };
+    }
 
     self.connection.invalidationHandler = {
       logger.info("Disconnected from broker (invalidated)")
-    };
+    }
 
     logger.info("Connecting to broker")
     self.listener.resume()
     self.connection.resume()
 
-    let service = self.connection.synchronousRemoteObjectProxyWithErrorHandler {
-      error in
-      logger.error("Unable to get remote service: \(error.localizedDescription, privacy: .public)")
-    } as? BrokerProtocol
+    let service =
+      self.connection.synchronousRemoteObjectProxyWithErrorHandler {
+        error in
+        logger.error("Unable to get remote service: \(error.localizedDescription, privacy: .public)")
+      } as? BrokerProtocol
 
     logger.info("Registering self as an executor")
     service!.registerCommandExecutor(client: self.listener.endpoint)

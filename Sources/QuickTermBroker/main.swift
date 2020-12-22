@@ -1,7 +1,6 @@
 import Foundation
-import os
-
 import QuickTermShared
+import os
 
 let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "broker")
 
@@ -10,7 +9,7 @@ let listener = NSXPCListener.service()
 
 let broker = Broker()
 let delegate = BrokerDelegate(broker)
-listener.delegate = delegate;
+listener.delegate = delegate
 
 logger.info("Listening")
 listener.resume()

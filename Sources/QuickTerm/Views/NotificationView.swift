@@ -1,13 +1,14 @@
-import SwiftUI
-
 import QuickTermLibrary
+import SwiftUI
 
 struct NotificationView: View {
   @ObservedObject var session: TerminalSession
 
   var body: some View {
     VStack(alignment: .leading) {
-      Text("❯ ").font(.custom("FiraMono-Regular", size: 11)).foregroundColor(session.hasFinished ? (session.wasSuccessful ? .green : .red) : .primary) + Text(session.configuration.command).font(.custom("FiraMono-Regular", size: 11))
+      Text("❯ ").font(.custom("FiraMono-Regular", size: 11))
+        .foregroundColor(session.hasFinished ? (session.wasSuccessful ? .green : .red) : .primary)
+        + Text(session.configuration.command).font(.custom("FiraMono-Regular", size: 11))
       ScrollView {
         outputText
       }
@@ -21,12 +22,14 @@ struct NotificationView: View {
         material: NSVisualEffectView.Material.popover,
         blendingMode: NSVisualEffectView.BlendingMode.behindWindow,
         cornerRadius: 10.0
-      ).shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 5)
+      )
+      .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 5)
     )
   }
 
   private var outputText: some View {
-    let result = Ansi.format(session.output).font(.custom("FiraMono-Regular", size: 11)).frame(maxWidth: .infinity, alignment: .leading).multilineTextAlignment(.leading)
+    let result = Ansi.format(session.output).font(.custom("FiraMono-Regular", size: 11))
+      .frame(maxWidth: .infinity, alignment: .leading).multilineTextAlignment(.leading)
     return Group {
       if session.configuration.animate {
         result.animation(.default)

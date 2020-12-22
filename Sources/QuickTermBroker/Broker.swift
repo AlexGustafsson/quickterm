@@ -1,5 +1,4 @@
 import Foundation
-
 import QuickTermShared
 
 @objc class Broker: NSObject, BrokerProtocol {
@@ -8,12 +7,17 @@ import QuickTermShared
 
   func registerCommandExecutor(client endpoint: NSXPCListenerEndpoint) {
     logger.info("Registering a command executor")
-		let connection = NSXPCConnection(listenerEndpoint: endpoint)
+    let connection = NSXPCConnection(listenerEndpoint: endpoint)
 
     // Configure message encoding
-		let interface = NSXPCInterface(with: CommandExecutorProtocol.self)
-		interface.setClasses([CommandConfiguration.self as AnyObject as! NSObject], for: #selector(CommandExecutorProtocol.queueCommand), argumentIndex: 0, ofReply: false)
-		connection.remoteObjectInterface = interface
+    let interface = NSXPCInterface(with: CommandExecutorProtocol.self)
+    interface.setClasses(
+      [CommandConfiguration.self as AnyObject as! NSObject],
+      for: #selector(CommandExecutorProtocol.queueCommand),
+      argumentIndex: 0,
+      ofReply: false
+    )
+    connection.remoteObjectInterface = interface
 
     if let executor = connection.remoteObjectProxy as? CommandExecutorProtocol {
       // Close any existing connection
@@ -32,23 +36,23 @@ import QuickTermShared
         logger.info("Disconnected from executor (interrupted)")
         self.executorConnection = nil
         self.executor = nil
-      };
+      }
 
       // An invalidation handler that is called if the connection can not be formed or the connection has terminated and may not be re-established.
       self.executorConnection?.invalidationHandler = {
         logger.info("Disconnected from executor (invalidated)")
         self.executorConnection = nil
         self.executor = nil
-      };
+      }
 
       // Start communication
-  		connection.resume()
+      connection.resume()
       logger.info("Registered command executor")
-		} else {
+    } else {
       logger.error("Got connection from non-conforming client")
       connection.invalidate()
     }
-	}
+  }
 
   func queueCommand(_ configuration: CommandConfiguration) {
     if self.executor == nil {
@@ -59,5 +63,5 @@ import QuickTermShared
     logger.info("Requesting command execution from executor")
     self.executor?.queueCommand(configuration)
     logger.info("Request sent")
-	}
+  }
 }

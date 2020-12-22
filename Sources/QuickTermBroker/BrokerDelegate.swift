@@ -1,8 +1,7 @@
 import Foundation
-
 import QuickTermShared
 
-class BrokerDelegate : NSObject, NSXPCListenerDelegate {
+class BrokerDelegate: NSObject, NSXPCListenerDelegate {
   private let broker: Broker
 
   init(_ broker: Broker) {

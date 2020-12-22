@@ -4,7 +4,7 @@ class BorderlessWindow: NSWindow {
   public var canMove: Bool = false
   private var initialLocation: NSPoint?
 
-  override var canBecomeKey: Bool  { true }
+  override var canBecomeKey: Bool { true }
   override var canBecomeMain: Bool { true }
 
   override func mouseDown(with event: NSEvent) {

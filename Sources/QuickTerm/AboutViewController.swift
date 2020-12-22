@@ -1,7 +1,6 @@
 import AppKit
-import SwiftUI
-
 import QuickTermShared
+import SwiftUI
 
 class AboutViewController {
   private let window: NSWindow!

@@ -54,23 +54,26 @@ class ExplicitFontTextField: NSTextField {
       if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue) == commandKey {
         switch event.charactersIgnoringModifiers! {
         case "x":
-            if NSApp.sendAction(#selector(NSText.cut(_:)), to: nil, from: self) { return true }
+          if NSApp.sendAction(#selector(NSText.cut(_:)), to: nil, from: self) { return true }
         case "c":
-            if NSApp.sendAction(#selector(NSText.copy(_:)), to: nil, from: self) { return true }
+          if NSApp.sendAction(#selector(NSText.copy(_:)), to: nil, from: self) { return true }
         case "v":
-            if NSApp.sendAction(#selector(NSText.paste(_:)), to: nil, from: self) { return true }
+          if NSApp.sendAction(#selector(NSText.paste(_:)), to: nil, from: self) { return true }
         case "z":
-            if NSApp.sendAction(Selector(("undo:")), to: nil, from: self) { return true }
+          if NSApp.sendAction(Selector(("undo:")), to: nil, from: self) { return true }
         case "a":
-            if NSApp.sendAction(#selector(NSResponder.selectAll(_:)), to: nil, from: self) { return true }
+          if NSApp.sendAction(#selector(NSResponder.selectAll(_:)), to: nil, from: self) { return true }
         default:
-            break
+          break
         }
-      } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue) == commandShiftKey {
+      } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue)
+        == commandShiftKey
+      {
         if event.charactersIgnoringModifiers == "Z" {
           if NSApp.sendAction(Selector(("redo:")), to: nil, from: self) { return true }
         }
-      } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue) == controlKey {
+      } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue) == controlKey
+      {
         // Like ctrl+c in a terminal - abort the command entry
         self.stringValue = ""
         return true
@@ -88,15 +91,21 @@ struct SpotlightTextField: NSViewRepresentable {
 
   @State var historyIndex: Int = -1
 
-  typealias CommitCallback = (_ text: String) -> ()
+  typealias CommitCallback = (_ text: String) -> Void
   public var onCommit: CommitCallback = { _ in }
 
-  typealias CancelCallback = () -> ()
+  typealias CancelCallback = () -> Void
   public var onCancel: CancelCallback = {}
 
   @State var becomeFirstResponder: Bool = true
 
-  init(_ placeholder: String, text: Binding<String>, commandHistoryManager: CommandHistoryManager, onCommit: @escaping CommitCallback, onCancel: @escaping CancelCallback) {
+  init(
+    _ placeholder: String,
+    text: Binding<String>,
+    commandHistoryManager: CommandHistoryManager,
+    onCommit: @escaping CommitCallback,
+    onCancel: @escaping CancelCallback
+  ) {
     self.placeholder = placeholder
     self._text = text
     self.commandHistoryManager = commandHistoryManager
@@ -151,7 +160,8 @@ struct SpotlightTextField: NSViewRepresentable {
       // Do nothing
     } else {
       self.historyIndex += 1
-      self.text = self.commandHistoryManager.items[self.commandHistoryManager.items.count - 1 - self.historyIndex].command
+      self.text =
+        self.commandHistoryManager.items[self.commandHistoryManager.items.count - 1 - self.historyIndex].command
       if let textField = self.textField {
         textField.currentEditor()?.selectedRange = NSMakeRange(self.text.count, 0)
       }
@@ -166,7 +176,8 @@ struct SpotlightTextField: NSViewRepresentable {
       self.text = ""
     } else {
       self.historyIndex -= 1
-      self.text = self.commandHistoryManager.items[self.commandHistoryManager.items.count - 1 - self.historyIndex].command
+      self.text =
+        self.commandHistoryManager.items[self.commandHistoryManager.items.count - 1 - self.historyIndex].command
       if let textField = self.textField {
         textField.currentEditor()?.selectedRange = NSMakeRange(self.text.count, 0)
       }
@@ -186,15 +197,15 @@ struct SpotlightTextField: NSViewRepresentable {
     }
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
-      if (commandSelector == #selector(NSResponder.insertNewline(_:))) {
+      if commandSelector == #selector(NSResponder.insertNewline(_:)) {
         self.parent.onCommit(textView.string)
         self.parent.text = ""
         self.parent.historyIndex = -1
         return true
-      } else if (commandSelector == #selector(NSResponder.insertTab(_:))) {
+      } else if commandSelector == #selector(NSResponder.insertTab(_:)) {
         self.parent.onTab()
         return true
-      } else if (commandSelector == #selector(NSResponder.cancelOperation(_:))) {
+      } else if commandSelector == #selector(NSResponder.cancelOperation(_:)) {
         self.parent.text = ""
         self.parent.historyIndex = -1
         self.parent.onCancel()

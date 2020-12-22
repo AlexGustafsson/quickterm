@@ -1,11 +1,10 @@
 import Foundation
+import QuickTermShared
 import os
 
-import QuickTermShared
-
 class TerminalSession: Identifiable, ObservableObject, Equatable {
-  typealias ActiveChangedCallback = (TerminalSession) -> ()
-	var onActiveChanged: ActiveChangedCallback = { _ in }
+  typealias ActiveChangedCallback = (TerminalSession) -> Void
+  var onActiveChanged: ActiveChangedCallback = { _ in }
 
   @Published private(set) var isRunning: Bool = false
   @Published private(set) var hasFinished: Bool = false
@@ -41,8 +40,8 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
     process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
     var command: String = configuration.command
     if configuration.shell == "bash" && configuration.sourceBashProfile {
-			command = "shopt -s expand_aliases;source ~/.bash_profile\n" + command
-		}
+      command = "shopt -s expand_aliases;source ~/.bash_profile\n" + command
+    }
     process.arguments = [configuration.shell, "-c", command]
     process.currentDirectoryURL = configuration.workingDirectory
     self.process = process
@@ -156,7 +155,7 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
     }
   }
 
-  static func ==(lhs: TerminalSession, rhs: TerminalSession) -> Bool {
+  static func == (lhs: TerminalSession, rhs: TerminalSession) -> Bool {
     lhs.id == rhs.id
   }
 }

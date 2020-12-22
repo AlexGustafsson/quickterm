@@ -1,7 +1,6 @@
 import Foundation
-import os
-
 import QuickTermShared
+import os
 
 class TerminalSessionManager: ObservableObject {
   @Published var sessions: [TerminalSession] = []

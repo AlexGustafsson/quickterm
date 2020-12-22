@@ -28,7 +28,7 @@ class CommandHistoryItem: Identifiable, ObservableObject, Equatable {
     self.executionDate = Date()
   }
 
-  static func ==(lhs: CommandHistoryItem, rhs: CommandHistoryItem) -> Bool {
+  static func == (lhs: CommandHistoryItem, rhs: CommandHistoryItem) -> Bool {
     lhs.id == rhs.id
   }
 }

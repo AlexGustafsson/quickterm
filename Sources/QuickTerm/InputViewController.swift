@@ -1,7 +1,6 @@
 import AppKit
-import SwiftUI
-
 import QuickTermShared
+import SwiftUI
 
 class InputViewController {
   private let commandHistoryManager: CommandHistoryManager
@@ -9,7 +8,7 @@ class InputViewController {
   private let window: BorderlessWindow!
   private var previousApp: NSRunningApplication? = nil
 
-  typealias ExecuteCallback = (_ command: String) -> ()
+  typealias ExecuteCallback = (_ command: String) -> Void
   public var onExecuteCommand: ExecuteCallback = { _ in }
 
   init?() {
@@ -58,7 +57,7 @@ class InputViewController {
 
   func onCommit(command: String) {
     logger.debug("Commiting command '\(command, privacy: .public)'")
-    if (command.count > 0) {
+    if command.count > 0 {
       self.onExecuteCommand(command)
       self.commandHistoryManager.append(CommandHistoryItem(command))
     }
@@ -71,7 +70,7 @@ class InputViewController {
 
   public func show() {
     DispatchQueue.main.async {
-      self.previousApp = NSWorkspace.shared.runningApplications.first(where: {$0.isActive})
+      self.previousApp = NSWorkspace.shared.runningApplications.first(where: { $0.isActive })
       self.window.makeKeyAndOrderFront(nil)
       NSApplication.shared.activate(ignoringOtherApps: true)
       logger.debug("Window can become key? \(self.window.canBecomeKey), \(self.window.canBecomeMain)")

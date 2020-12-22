@@ -1,11 +1,11 @@
-import os
 import SwiftUI
+import os
 
 let logger = Logger(subsystem: "se.axgn.QuickTermLibrary", category: "library")
 
 public enum AnsiParseTreeNode {
-case string(String)
-case code(AnsiCode)
+  case string(String)
+  case code(AnsiCode)
 }
 
 public class AnsiCode: CustomStringConvertible {
@@ -15,7 +15,12 @@ public class AnsiCode: CustomStringConvertible {
     self.count = count
   }
 
-  static func parse(firstParameter: String?, firstCharacter: Character?, secondParameter: String?, secondCharacter: Character?) -> AnsiCode? {
+  static func parse(
+    firstParameter: String?,
+    firstCharacter: Character?,
+    secondParameter: String?,
+    secondCharacter: Character?
+  ) -> AnsiCode? {
     return AnsiCode(2 + (firstParameter?.count ?? 0) + 1)
   }
 
@@ -25,7 +30,7 @@ public class AnsiCode: CustomStringConvertible {
 }
 
 public enum AnsiState {
-case start, escape, bracket, firstParameter, firstCharacter, semicolon, secondParameter, secondCharacter, end
+  case start, escape, bracket, firstParameter, firstCharacter, semicolon, secondParameter, secondCharacter, end
 }
 
 public class Ansi {
@@ -57,7 +62,7 @@ public class Ansi {
     while let index = potentialCode.firstIndex(of: Ansi.escape) {
       logger.info("Found index of escape character")
       // Skip the escape code
-      potentialCode = potentialCode[potentialCode.index(index, offsetBy: 1) ..< potentialCode.endIndex]
+      potentialCode = potentialCode[potentialCode.index(index, offsetBy: 1)..<potentialCode.endIndex]
       var state: AnsiState = .escape
       var firstParameter: String = ""
       var firstCharacter: Character? = nil
@@ -102,10 +107,16 @@ public class Ansi {
         }
       }
 
-      if let code = AnsiCode.parse(firstParameter: firstParameter, firstCharacter: firstCharacter, secondParameter: secondParameter, secondCharacter: secondCharacter) {
-        nodes.append(.string(String(text[previousNodeIndex ..< index])))
+      if let code = AnsiCode.parse(
+        firstParameter: firstParameter,
+        firstCharacter: firstCharacter,
+        secondParameter: secondParameter,
+        secondCharacter: secondCharacter
+      ) {
+        nodes.append(.string(String(text[previousNodeIndex..<index])))
         nodes.append(.code(code))
-        potentialCode = potentialCode[potentialCode.index(potentialCode.startIndex, offsetBy: code.count) ..< potentialCode.endIndex]
+        potentialCode =
+          potentialCode[potentialCode.index(potentialCode.startIndex, offsetBy: code.count)..<potentialCode.endIndex]
         previousNodeIndex = text.index(previousNodeIndex, offsetBy: code.count)
       }
     }

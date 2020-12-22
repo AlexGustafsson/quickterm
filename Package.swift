@@ -10,7 +10,7 @@ let package = Package(
     .library(name: "QuickTermShared", targets: ["QuickTermShared"]),
     .executable(name: "QuickTerm", targets: ["QuickTerm"]),
     .library(name: "QuickTermLibrary", targets: ["QuickTermLibrary"]),
-    .executable(name: "QuickTermBroker", targets: ["QuickTermBroker"])
+    .executable(name: "QuickTermBroker", targets: ["QuickTermBroker"]),
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.0")),
@@ -25,10 +25,13 @@ let package = Package(
         .product(name: "Introspect", package: "Introspect"),
         .product(name: "HotKey", package: "HotKey"),
         "QuickTermShared",
-        "QuickTermLibrary"
+        "QuickTermLibrary",
       ],
       linkerSettings: [
-        .unsafeFlags(["-Xlinker", "-sectcreate", "-Xlinker", "__TEXT", "-Xlinker", "__info_plist", "-Xlinker", "./SupportingFiles/QuickTerm/Info.plist"]),
+        .unsafeFlags([
+          "-Xlinker", "-sectcreate", "-Xlinker", "__TEXT", "-Xlinker", "__info_plist", "-Xlinker",
+          "./SupportingFiles/QuickTerm/Info.plist",
+        ])
       ]
     ),
     .target(
@@ -45,7 +48,10 @@ let package = Package(
       name: "QuickTermBroker",
       dependencies: ["QuickTermShared"],
       linkerSettings: [
-        .unsafeFlags(["-Xlinker", "-sectcreate", "-Xlinker", "__TEXT", "-Xlinker", "__info_plist", "-Xlinker", "./SupportingFiles/QuickTermBroker/Info.plist"]),
+        .unsafeFlags([
+          "-Xlinker", "-sectcreate", "-Xlinker", "__TEXT", "-Xlinker", "__info_plist", "-Xlinker",
+          "./SupportingFiles/QuickTermBroker/Info.plist",
+        ])
       ]
     ),
     .target(

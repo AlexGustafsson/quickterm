@@ -1,30 +1,39 @@
 import AppKit
+import QuickTermShared
 import SwiftUI
 
-import QuickTermShared
+class NotificationHostingView: NSHostingView<ContentView> {
+  typealias FocusChangedCallback = (Bool) -> Void
+  var onFocusChanged: FocusChangedCallback = { _ in }
 
-class NotificationHostingView : NSHostingView<ContentView> {
-  typealias FocusChangedCallback = (Bool) -> ()
-	var onFocusChanged: FocusChangedCallback = { _ in }
-
-  private var trackingArea: NSTrackingArea    = NSTrackingArea()
+  private var trackingArea: NSTrackingArea = NSTrackingArea()
 
   override func viewWillMove(toWindow newWindow: NSWindow?) {
     // Setup a new tracking area when the view is added to the window.
-     trackingArea = NSTrackingArea(rect: self.bounds, options: [.mouseEnteredAndExited, .activeAlways], owner: self, userInfo: nil)
-     self.addTrackingArea(trackingArea)
+    trackingArea = NSTrackingArea(
+      rect: self.bounds,
+      options: [.mouseEnteredAndExited, .activeAlways],
+      owner: self,
+      userInfo: nil
+    )
+    self.addTrackingArea(trackingArea)
   }
 
   override func updateTrackingAreas() {
     self.removeTrackingArea(trackingArea)
 
-    trackingArea = NSTrackingArea(rect: self.bounds, options: [.mouseEnteredAndExited, .activeAlways], owner: self, userInfo: nil)
+    trackingArea = NSTrackingArea(
+      rect: self.bounds,
+      options: [.mouseEnteredAndExited, .activeAlways],
+      owner: self,
+      userInfo: nil
+    )
     self.addTrackingArea(trackingArea)
   }
 
   override func mouseEntered(with event: NSEvent) {
     self.onFocusChanged(true)
- }
+  }
 
   override func mouseExited(with event: NSEvent) {
     self.onFocusChanged(false)
