@@ -25,6 +25,9 @@ class ExplicitFontTextFieldCell: NSTextFieldCell {
 // unless this is done, the font is always cleared by the system
 // no matter how it is set...
 class ExplicitFontTextField: NSTextField {
+  private let commandKey = NSEvent.ModifierFlags.command.rawValue
+  private let commandShiftKey = NSEvent.ModifierFlags.command.rawValue | NSEvent.ModifierFlags.shift.rawValue
+
   override class var cellClass: AnyClass? {
     get { ExplicitFontTextFieldCell.self }
     set {}
@@ -43,6 +46,32 @@ class ExplicitFontTextField: NSTextField {
         logger.error("Unable to load font")
       }
     }
+  }
+
+  override func performKeyEquivalent(with event: NSEvent) -> Bool {
+    if event.type == NSEvent.EventType.keyDown {
+      if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue) == commandKey {
+        switch event.charactersIgnoringModifiers! {
+        case "x":
+            if NSApp.sendAction(#selector(NSText.cut(_:)), to: nil, from: self) { return true }
+        case "c":
+            if NSApp.sendAction(#selector(NSText.copy(_:)), to: nil, from: self) { return true }
+        case "v":
+            if NSApp.sendAction(#selector(NSText.paste(_:)), to: nil, from: self) { return true }
+        case "z":
+            if NSApp.sendAction(Selector(("undo:")), to: nil, from: self) { return true }
+        case "a":
+            if NSApp.sendAction(#selector(NSResponder.selectAll(_:)), to: nil, from: self) { return true }
+        default:
+            break
+        }
+      } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue) == commandShiftKey {
+        if event.charactersIgnoringModifiers == "Z" {
+          if NSApp.sendAction(Selector(("redo:")), to: nil, from: self) { return true }
+        }
+      }
+    }
+    return super.performKeyEquivalent(with: event)
   }
 }
 
@@ -164,14 +193,6 @@ struct SpotlightTextField: NSViewRepresentable {
         self.parent.text = ""
         self.parent.historyIndex = -1
         self.parent.onCancel()
-        return true
-      } else if commandSelector == NSSelectorFromString("noop:") {
-        // TODO: This is likely not the correct way to do this,
-        // but for now it seems to work.
-        // The correct way likely includes identifying the correct event
-        // from the event queue and then checking the flags to see if it
-        // was actually "select all"
-        textView.selectedRange = NSMakeRange(0, textView.string.count)
         return true
       } else if commandSelector == #selector(NSResponder.moveUp(_:)) {
         self.parent.onPreviousInHistory()
