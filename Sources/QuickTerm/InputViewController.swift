@@ -7,6 +7,7 @@ class InputViewController {
   private let commandHistoryManager: CommandHistoryManager
   private var inputView: InputView!
   private let window: BorderlessWindow!
+  private var previousApp: NSRunningApplication? = nil
 
   typealias ExecuteCallback = (_ command: String) -> ()
   public var onExecuteCommand: ExecuteCallback = { _ in }
@@ -76,6 +77,7 @@ class InputViewController {
 
   public func show() {
     DispatchQueue.main.async {
+      self.previousApp = NSWorkspace.shared.runningApplications.first(where: {$0.isActive})
       self.window.makeKeyAndOrderFront(nil)
       NSApplication.shared.activate(ignoringOtherApps: true)
       logger.debug("Window can become key? \(self.window.canBecomeKey), \(self.window.canBecomeMain)")
@@ -86,5 +88,7 @@ class InputViewController {
   public func hide() {
     self.window.orderOut(nil)
     self.inputView.command = ""
+    self.previousApp?.activate(options: .activateAllWindows)
+    self.previousApp = nil
   }
 }
