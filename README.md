@@ -18,6 +18,8 @@
 # QuickTerm
 ### A macOS 11 application for quickly running shell commands
 
+Note: QuickTerm is currently being actively developed. Until it reaches v1.0.0 breaking changes may occur in minor versions.
+
 <a id="quickstart"></a>
 ## Quick Start
 
@@ -146,7 +148,7 @@ To get started with the CLI, run `quick --help` to see the available functions.
 ```
 OVERVIEW: Run a command in a separate window
 
-USAGE: quick [--animate] [--shell <shell>] [--timeout <timeout>] [--keep] [--wait-for-exit] [--dump] [--no-bash-profile] [<command> ...]
+USAGE: quick [--animate] [--shell <shell>] [--timeout <timeout>] [--keep] [--wait-for-exit] [--dump] [--no-bash-profile] [--delay-after-exit <delay-after-exit>] [<command> ...]
 
 ARGUMENTS:
   <command>               Command to execute. If none is given, starts the daemon instead
@@ -159,6 +161,8 @@ OPTIONS:
   --wait-for-exit         Whether or not to wait for the command to exit before presenting the view
   --dump                  Dump the command configuration as JSON. Will be used if the command is to be ran
   --no-bash-profile       Don't source `~/.bash_profile` before executing the command. Applicable only when using Bash as shell
+  --delay-after-exit <delay-after-exit>
+                          The number of seconds to wait after exit before closing the notification. Not used if keep is true (default: 3.0)
   -h, --help              Show help information.
 ```
 
