@@ -3,7 +3,6 @@ import Foundation
 import QuickTermShared
 
 @objc class Broker: NSObject, BrokerProtocol {
-  // TODO: Lock?
   private var executorConnection: NSXPCConnection? = nil
   private var executor: CommandExecutorProtocol? = nil
 
@@ -53,8 +52,6 @@ import QuickTermShared
 
   func queueCommand(_ configuration: CommandConfiguration) {
     if self.executor == nil {
-      // TODO: This should be able to be handled with a client protocol,
-      // execute a "withError" or something
       logger.error("No executor registered - command will not be executed")
       return
     }

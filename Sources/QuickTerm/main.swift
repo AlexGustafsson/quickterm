@@ -50,12 +50,10 @@ func sendCommandToDaemon(_ commandConfiguration: QuickTermShared.CommandConfigur
 
   connection.interruptionHandler = {
     print("Disconnected from broker (interrupted)", to:&stderr)
-    // TODO: Exit(1)
   };
 
   connection.invalidationHandler = {
     print("Disconnected from broker (invalidated)", to:&stderr)
-    // TODO: Exit(1)
   };
 
   connection.resume()

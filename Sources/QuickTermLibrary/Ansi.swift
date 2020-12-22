@@ -41,7 +41,6 @@ public class Ansi {
     for node in nodes {
       switch node {
       case .code(let code):
-        // TODO: set modes etc.
         color = Color.white
       case .string(let string):
         result = result + Text(string)

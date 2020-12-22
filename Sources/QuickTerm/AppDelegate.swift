@@ -68,8 +68,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       }
       let session = TerminalSession(configuration)
 
-      // TODO: handle delayed start etc.
-
       // Add the session when started
       session.onStarted = {
         _ in
@@ -103,12 +101,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     self.connection.interruptionHandler = {
       logger.info("Disconnected from broker (interrupted)")
-      // TODO: crash the app?
     };
 
     self.connection.invalidationHandler = {
       logger.info("Disconnected from broker (invalidated)")
-      // TODO: crash the app?
     };
 
     logger.info("Connecting to broker")
@@ -139,8 +135,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
       let session = TerminalSession(configuration)
 
-      // TODO: handle delayed start etc.
-
       // Add the session when started
       session.onStarted = {
         _ in
@@ -166,8 +160,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
   }
 
-  // TODO: When closing the window and
-  // isReleasedWhenClosed is true, the app crashes due to a segmentation fault
   @objc func handleAbout() {
     let viewController = AboutViewController()
     viewController.show()
@@ -178,7 +170,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   func applicationWillTerminate(_ aNotification: Notification) {
-    // TODO: stop all processes?
     // Insert code here to tear down your application
   }
 
