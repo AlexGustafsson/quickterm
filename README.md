@@ -88,7 +88,7 @@ git clone https://github.com/AlexGustafsson/quickterm.git && cd quickterm
 Optionally check out a specific version.
 
 ```
-git checkout v0.1.0
+git checkout v0.2.0
 ```
 
 Build the application.
