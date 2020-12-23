@@ -48,10 +48,12 @@ func sendCommandToDaemon(_ commandConfiguration: QuickTermShared.CommandConfigur
 
   connection.interruptionHandler = {
     print("Disconnected from broker (interrupted)", to: &stderr)
+    exit(1)
   }
 
   connection.invalidationHandler = {
     print("Disconnected from broker (invalidated)", to: &stderr)
+    exit(1)
   }
 
   connection.resume()
@@ -62,7 +64,7 @@ func sendCommandToDaemon(_ commandConfiguration: QuickTermShared.CommandConfigur
       error in
       logger.error("\(error.localizedDescription, privacy: .public)")
       print("Received error:", error, to: &stderr)
-
+      exit(1)
     } as? BrokerProtocol
   logger.debug("Got service protocol")
 
