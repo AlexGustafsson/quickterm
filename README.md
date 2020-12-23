@@ -151,7 +151,7 @@ To get started with the CLI, run `quick --help` to see the available functions.
 ```
 OVERVIEW: Run a command in a separate window
 
-USAGE: quick [--animate] [--shell <shell>] [--timeout <timeout>] [--keep] [--wait-for-exit] [--dump] [--no-bash-profile] [--delay-after-exit <delay-after-exit>] [<command> ...]
+USAGE: quick [--animate] [--shell <shell>] [--timeout <timeout>] [--keep] [--wait-for-exit] [--no-bash-profile] [--delay-after-exit <delay-after-exit>] [--dump] [--print-config-path] [--verbose] [<command> ...]
 
 ARGUMENTS:
   <command>               Command to execute. If none is given, starts the daemon instead
@@ -162,10 +162,11 @@ OPTIONS:
   --timeout <timeout>     The number of seconds to wait before terminating the command (default: 5.0)
   --keep                  Whether or not the window should stay until the command finishes or is closed
   --wait-for-exit         Whether or not to wait for the command to exit before presenting the view
-  --dump                  Dump the command configuration as JSON. Will be used if the command is to be ran
   --no-bash-profile       Don't source `~/.bash_profile` before executing the command. Applicable only when using Bash as shell
   --delay-after-exit <delay-after-exit>
                           The number of seconds to wait after exit before closing the notification. Not used if keep is true (default: 3.0)
+  --dump                  Dump the command configuration as JSON. Will be used if the command is to be ran
+  --print-config-path     Print the path to the config file
   -h, --help              Show help information.
 ```
 
@@ -214,6 +215,14 @@ hotkeys:
 The values should be familiar as they are the same as those configurable via the CLI on a per-command basis.
 
 The CLI will load the config each time it's run - so the values will be updated each time. The UI / daemon, however, will need to be restarted before the config is used.
+
+To open the config, either use the UI via Open Configuration File, or use the CLI; `nano $(quick --print-config-path)`.
+
+To easily show your current configuration, you can use quick:
+
+```
+quick 'cat $(quick --print-config-path)'
+```
 
 <a id="screenshots"></a>
 ## Screenshots

@@ -100,8 +100,8 @@ struct Quick: ParsableCommand {
   @Flag(help: "Dump the command configuration as JSON. Will be used if the command is to be ran")
   var dump: Bool = false
 
-  @Flag(help: "Verbose output for errors etc.")
-  var verbose: Bool = false
+  @Flag(help: "Print the path to the config file")
+  var printConfigPath: Bool = false
 
   // Add an explicit help flag so that the help flag works even though
   // uncoditional remaining parsing is used for the arguments below
@@ -119,6 +119,15 @@ struct Quick: ParsableCommand {
   func validate() throws {
     if help && arguments.count == 0 {
       throw CleanExit.helpRequest()
+    }
+
+    if printConfigPath && arguments.count == 0 {
+      var configFile = FileManager.default.homeDirectoryForCurrentUser
+      configFile.appendPathComponent(".config", isDirectory: true)
+      configFile.appendPathComponent("quickterm", isDirectory: true)
+      configFile.appendPathComponent("config.yml")
+      print(configFile.path)
+      throw ExitCode(0)
     }
 
     guard timeout >= 0 else {
