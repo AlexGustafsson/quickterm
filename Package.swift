@@ -14,7 +14,6 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.0")),
-    .package(name: "Introspect", url: "https://github.com/siteline/SwiftUI-Introspect", .upToNextMinor(from: "0.1.2")),
     .package(url: "https://github.com/soffes/HotKey", from: "0.1.3"),
   ],
   targets: [
@@ -22,7 +21,6 @@ let package = Package(
       name: "QuickTerm",
       dependencies: [
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
-        .product(name: "Introspect", package: "Introspect"),
         .product(name: "HotKey", package: "HotKey"),
         "QuickTermShared",
         "QuickTermLibrary",
