@@ -54,14 +54,16 @@ import QuickTermShared
     }
   }
 
-  func queueCommand(_ configuration: CommandConfiguration) {
+  func queueCommand(_ configuration: CommandConfiguration, withReply reply: BrokerProtocol.ReplyCallback) {
     if self.executor == nil {
       logger.error("No executor registered - command will not be executed")
+      reply(false)
       return
     }
 
     logger.info("Requesting command execution from executor")
     self.executor?.queueCommand(configuration)
     logger.info("Request sent")
+    reply(true)
   }
 }

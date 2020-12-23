@@ -67,7 +67,14 @@ func sendCommandToDaemon(_ commandConfiguration: QuickTermShared.CommandConfigur
   logger.debug("Got service protocol")
 
   logger.info("Sending request to execute command")
-  service!.queueCommand(commandConfiguration)
+  service!.queueCommand(commandConfiguration, withReply: {
+    wasSuccessful in
+    logger.info("Request was \(wasSuccessful ? "successful" : "unsuccessful", privacy: .public)")
+    if !wasSuccessful {
+      print("Unable to schedule command", to: &stderr)
+      exit(1)
+    }
+  })
 }
 
 struct Quick: ParsableCommand {
