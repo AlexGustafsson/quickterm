@@ -1,6 +1,11 @@
 # Disable echoing of commands
 MAKEFLAGS += --silent
 
+# Always use clang, no matter if GCC is configured
+CXX=clang
+CPP=clang
+CC=clang
+
 .PHONY: build run test lint format package sign logs help clean
 
 modules=QuickTerm QuickTermBroker

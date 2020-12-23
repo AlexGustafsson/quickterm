@@ -19,10 +19,9 @@ func findDaemon() -> NSRunningApplication? {
   return nil
 }
 
-func startApplication() throws {
+func startApplication(isInTTY: Bool) throws {
   // Start the app via launchd instead if started from a terminal
   // Basically "daemonizes" the app
-  let isInTTY = isatty(0) == 1
   if isInTTY {
     let bundlePath = Bundle.main.bundlePath
     NSWorkspace.shared.open(URL(fileURLWithPath: bundlePath))
@@ -78,28 +77,31 @@ struct Quick: ParsableCommand {
     help:
       "Whether or not the output should be animated as it's received. Does not work with --wait-for-exit as the output is fully available when shown"
   )
-  var animate: Bool = false
+  var animate: Bool = Config.current.commandConfiguration.animate
 
   @Option(help: "The shell to use")
-  var shell: String = "bash"
+  var shell: String = Config.current.commandConfiguration.shell
 
   @Option(help: "The number of seconds to wait before terminating the command")
-  var timeout: Double = 5.0
+  var timeout: Double = Config.current.commandConfiguration.timeout
 
   @Flag(help: "Whether or not the window should stay until the command finishes or is closed")
-  var keep: Bool = false
+  var keep: Bool = Config.current.commandConfiguration.keep
 
   @Flag(help: "Whether or not to wait for the command to exit before presenting the view")
-  var waitForExit: Bool = false
+  var waitForExit: Bool = Config.current.commandConfiguration.waitForExit
+
+  @Flag(help: "Don't source `~/.bash_profile` before executing the command. Applicable only when using Bash as shell")
+  var noBashProfile: Bool = !Config.current.commandConfiguration.sourceBashProfile
+
+  @Option(help: "The number of seconds to wait after exit before closing the notification. Not used if keep is true")
+  var delayAfterExit: Double = Config.current.commandConfiguration.delayAfterExit
 
   @Flag(help: "Dump the command configuration as JSON. Will be used if the command is to be ran")
   var dump: Bool = false
 
-  @Flag(help: "Don't source `~/.bash_profile` before executing the command. Applicable only when using Bash as shell")
-  var noBashProfile: Bool = false
-
-  @Option(help: "The number of seconds to wait after exit before closing the notification. Not used if keep is true")
-  var delayAfterExit: Double = 3
+  @Flag(help: "Verbose output for errors etc.")
+  var verbose: Bool = false
 
   // Add an explicit help flag so that the help flag works even though
   // uncoditional remaining parsing is used for the arguments below
@@ -111,6 +113,8 @@ struct Quick: ParsableCommand {
     help: ArgumentHelp("Command to execute. If none is given, starts the daemon instead", valueName: "command")
   )
   var arguments: [String] = []
+
+  private let isInTTY: Bool = isatty(0) == 1
 
   func validate() throws {
     if help && arguments.count == 0 {
@@ -141,6 +145,7 @@ struct Quick: ParsableCommand {
           shell: shell,
           timeout: timeout,
           keep: keep,
+          startTime: Date(),
           animate: animate,
           waitForExit: waitForExit,
           sourceBashProfile: !noBashProfile,
@@ -155,12 +160,34 @@ struct Quick: ParsableCommand {
       }
     } else {
       if command == "" {
-        try startApplication()
+        try startApplication(isInTTY: isInTTY)
       } else {
         print("Daemon is not running", to: &stderr)
         throw ExitCode(1)
       }
     }
+  }
+}
+
+do {
+  try Config.dump()
+} catch let error {
+  logger.error("Unable to create configuration file: \(error.localizedDescription)")
+}
+
+do {
+  try Config.load()
+} catch let error {
+  logger.error("Unable to load configuration file: \(error.localizedDescription)")
+  if isatty(0) == 1 {
+    print("Unable to load configuration file: \(error.localizedDescription) Using defaults.", to: &stderr)
+  } else {
+    let alert = NSAlert()
+    alert.messageText = "Unable to load configuration file"
+    alert.informativeText = "Unable to load configuration file: \(error.localizedDescription) The built-in defaults will be used instead."
+    alert.addButton(withTitle: "OK")
+    alert.alertStyle = .warning
+    alert.runModal()
   }
 }
 

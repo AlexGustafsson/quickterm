@@ -183,6 +183,38 @@ quick --timeout 5 --animate --shell zsh --dump echo "Hello, World!"
 {"shell":"zsh","animate":true,"timeout":5,"keep":false,"workingDirectory":"file:\/\/\/path\/to\/working\/directory\/","startTime":630156023.25511503,"command":"echo Hello, World!"}
 ```
 
+### Configuration
+
+QuickTerm is fully configurable. Its config is stored in `~/.config/quickterm/config.yml`. The file is created at launch if it does not already exist. If the file cannot be parsed, the CLI will print an error, the UI will show and alert, but both will continue to work - using the default config instead.
+
+The configuration file looks like this (without the comments):
+
+```yaml
+# Configuration for execution of commands
+commandConfiguration:
+  # The shell to use (called like so: to /usr/bin/env <shell> -c <command>)
+  shell: bash
+  # The number of seconds to wait before terminating the command
+  timeout: 5e+0
+  # Whether or not the window should stay until the command finishes or is closed
+  keep: false
+  # Whether or not the output should be animated as it's received. Does not work with waitForExit as the output is fully available when shown
+  animate: false
+  # Whether or not to wait for the command to exit before presenting the view
+  waitForExit: false
+  # Source `~/.bash_profile` before executing the command. Applicable only when using Bash as shell
+  sourceBashProfile: true
+  # The number of seconds to wait after exit before closing the notification. Not used if keep is true
+  delayAfterExit: 3e+0
+hotkeys:
+  # The global hotkey used for showing the input view (this value currently does nothing)
+  showCommandEntry: option+cmd+t
+```
+
+The values should be familiar as they are the same as those configurable via the CLI on a per-command basis.
+
+The CLI will load the config each time it's run - so the values will be updated each time. The UI / daemon, however, will need to be restarted before the config is used.
+
 <a id="screenshots"></a>
 ## Screenshots
 

@@ -73,21 +73,21 @@ import Foundation
   public init(
     workingDirectory: URL,
     command: String,
-    shell: String = "bash",
-    timeout: Double = 5,
-    keep: Bool = false,
-    startTime: Date? = nil,
-    animate: Bool = false,
-    waitForExit: Bool = false,
-    sourceBashProfile: Bool = true,
-    delayAfterExit: Double = 3
+    shell: String,
+    timeout: Double,
+    keep: Bool,
+    startTime: Date,
+    animate: Bool,
+    waitForExit: Bool,
+    sourceBashProfile: Bool,
+    delayAfterExit: Double
   ) {
     self.workingDirectory = workingDirectory
     self.command = command
     self.shell = shell
     self.timeout = timeout
     self.keep = keep
-    self.startTime = startTime ?? Date()
+    self.startTime = startTime
     self.animate = animate
     self.waitForExit = waitForExit
     self.sourceBashProfile = sourceBashProfile

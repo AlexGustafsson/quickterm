@@ -101,9 +101,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     self.inputViewController.onExecuteCommand = {
       command in
       let workingDirectory: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-      let configuration = CommandConfiguration(
+      let configuration = QuickTermShared.CommandConfiguration(
         workingDirectory: workingDirectory,
-        command: command
+        command: command,
+        shell: Config.current.commandConfiguration.shell,
+        timeout: Config.current.commandConfiguration.timeout,
+        keep: Config.current.commandConfiguration.keep,
+        startTime: Date(),
+        animate: Config.current.commandConfiguration.animate,
+        waitForExit: Config.current.commandConfiguration.waitForExit,
+        sourceBashProfile: Config.current.commandConfiguration.sourceBashProfile,
+        delayAfterExit: Config.current.commandConfiguration.delayAfterExit
       )
       let session = TerminalSession(configuration)
       self.sessionManager.schedule(session)
