@@ -60,6 +60,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     )
     menu.addItem(NSMenuItem.separator())
     menu.addItem(
+      NSMenuItem(
+        title: "Open Configuration File",
+        action: #selector(self.openConfigurationFile),
+        keyEquivalent: ""
+      )
+    )
+    menu.addItem(
       NSMenuItem(title: "Quit \(applicationName)", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "")
     )
 
@@ -125,6 +132,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   @objc func handleCommandEntry() {
     self.inputViewController.show()
+  }
+
+  @objc func openConfigurationFile() {
+    var configFile = FileManager.default.homeDirectoryForCurrentUser
+    configFile.appendPathComponent(".config", isDirectory: true)
+    configFile.appendPathComponent("quickterm", isDirectory: true)
+    configFile.appendPathComponent("config.yml")
+    NSWorkspace.shared.openFile(configFile.path)
   }
 
   func applicationWillTerminate(_ aNotification: Notification) {
