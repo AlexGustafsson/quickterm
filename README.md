@@ -214,7 +214,7 @@ hotkeys:
 
 The values should be familiar as they are the same as those configurable via the CLI on a per-command basis.
 
-The CLI will load the config each time it's run - so the values will be updated each time. The UI / daemon, however, will need to be restarted before the config is used.
+The CLI will load the config each time it's run - so the values will be updated each time. The UI / daemon watches the file for changes and will reload the config automatically.
 
 To open the config, either use the UI via Open Configuration File, or use the CLI; `nano $(quick --print-config-path)`.
 
