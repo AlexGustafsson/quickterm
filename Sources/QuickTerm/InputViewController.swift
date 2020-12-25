@@ -20,10 +20,13 @@ class InputViewController {
     let width = CGFloat(880)
     let height = CGFloat(250)
 
+    let centerX = mainScreen.visibleFrame.minX + CGFloat((mainScreen.visibleFrame.width - width) / 2)
+    let centerY = mainScreen.visibleFrame.minY + CGFloat((mainScreen.visibleFrame.height - height) / 2)
+
     self.window = BorderlessWindow(
       contentRect: NSRect(
-        x: mainScreen.visibleFrame.minX + (mainScreen.visibleFrame.width - width) / 2,
-        y: mainScreen.visibleFrame.minY + (mainScreen.visibleFrame.height - height) / 2,
+        x: centerX,
+        y: centerY,
         width: width,
         height: height
       ),
@@ -38,6 +41,11 @@ class InputViewController {
     self.window.tabbingMode = .disallowed
     self.window.backgroundColor = .clear
     self.window.isOpaque = false
+
+    let horizontalCenter = Guideline(x: centerX, y: centerY, threshold: CGFloat(10), orientation: .horizontal)
+    let verticalCenter = Guideline(x: centerX, y: centerY, threshold: CGFloat(10), orientation: .vertical)
+    self.window.guidelines.append(horizontalCenter)
+    self.window.guidelines.append(verticalCenter)
 
     self.commandHistoryManager = CommandHistoryManager()
     self.inputView = InputView(commandHistoryManager: commandHistoryManager, onCommit: onCommit, onCancel: onCancel)
