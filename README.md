@@ -293,6 +293,22 @@ make package
 make clean
 ```
 
+### Code layout
+
+Project-wide files such as the Makefile etc. lies at the top of the directory tree.
+
+The `Sources` and `Tests` directory are home for source files and tests, respectively. Each project has their own directory.
+
+The `SupportingFiles` directory contains one directory per subproject. Each project directory has files such as `Info.plist`, `Entitlements.plist` and resources (which are copied to the built app bundle).
+
+The following directories may exist in each project's source directory:
+
+* `Components` - SwiftUI view components, such as a button etc.
+* `Controllers` - Window / view controllers
+* `Extensions` - Extensions to existing Swift classes such as `Color`
+* `Utilities` - Utilities such as algorithm implementations (`Queue` etc.)
+* `Views` - SwiftUI views
+
 ### Contributors
 
 Inspired by [qcmd](https://radioaktiv.zone/git/b/qcmd) by [b10rn](https://github.com/b10rn).
