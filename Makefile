@@ -72,13 +72,30 @@ build/QuickTermBroker.xpc: build/QuickTermBroker/release/QuickTermBroker Support
 	cp build/QuickTermBroker/release/QuickTermBroker build/QuickTermBroker.xpc/Contents/MacOS
 	cp SupportingFiles/QuickTermBroker/Info.plist build/QuickTermBroker.xpc/Contents
 
-build/QuickTerm.app: build/QuickTerm/release/QuickTerm SupportingFiles/QuickTerm/Info.plist build/QuickTermBroker.xpc
+build/QuickTerm.app: build/QuickTerm/release/QuickTerm SupportingFiles/QuickTerm/Info.plist build/QuickTermBroker.xpc build/AppIcon.icns
 	mkdir -p build/QuickTerm.app/Contents/MacOS
 	mkdir -p build/QuickTerm.app/Contents/XPCServices
 	cp build/QuickTerm/release/QuickTerm build/QuickTerm.app/Contents/MacOS
 	cp SupportingFiles/QuickTerm/Info.plist build/QuickTerm.app/Contents
 	cp -r build/QuickTermBroker.xpc build/QuickTerm.app/Contents/XPCServices
 	cp -r SupportingFiles/QuickTerm/Resources build/QuickTerm.app/Contents/Resources
+	cp build/AppIcon.icns build/QuickTerm.app/Contents/Resources/AppIcon.icns
+
+build/AppIcon.icns: SupportingFiles/QuickTerm/icon.png
+	rm -r ./build/AppIcon.iconset ./build/AppIcon.icns &>/dev/null || true
+	mkdir -p ./build/AppIcon.iconset
+	# Create icons for different sizes
+	sips -z 16 16 $< --out "./build/AppIcon.iconset/icon_16x16.png"
+	sips -z 32 32 $< --out "./build/AppIcon.iconset/icon_16x16@2x.png"
+	sips -z 32 32 $< --out "./build/AppIcon.iconset/icon_32x32.png"
+	sips -z 64 64 $< --out "./build/AppIcon.iconset/icon_32x32@2x.png"
+	sips -z 128 128 $< --out "./build/AppIcon.iconset/icon_128x128.png"
+	sips -z 256 256 $< --out "./build/AppIcon.iconset/icon_128x128@2x.png"
+	sips -z 256 256 $< --out "./build/AppIcon.iconset/icon_256x256.png"
+	sips -z 512 512 $< --out "./build/AppIcon.iconset/icon_256x256@2x.png"
+	sips -z 512 512 $< --out "./build/AppIcon.iconset/icon_512x512.png"
+	# Compile icons
+	iconutil --convert icns --output ./build/AppIcon.icns ./build/AppIcon.iconset
 
 # Requires NPM and clang
 build/QuickTerm\ $(version).dmg: build/QuickTerm.app

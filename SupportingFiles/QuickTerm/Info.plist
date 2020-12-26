@@ -22,5 +22,7 @@
 		<string>true</string>
 		<key>ATSApplicationFontsPath</key>
 		<string>Fonts</string>
+		<key>CFBundleIconFile</key>
+		<string>AppIcon.icns</string>
 	</dict>
 </plist>
