@@ -95,25 +95,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       self.sessionManager.schedule(session)
     }
 
-    var configFile = FileManager.default.homeDirectoryForCurrentUser
-    configFile.appendPathComponent(".config", isDirectory: true)
-    configFile.appendPathComponent("quickterm", isDirectory: true)
-    configFile.appendPathComponent("config.yml", isDirectory: false)
-    self.configObserver = FileObserver(configFile) {
+    self.configObserver = FileObserver(Config.filePath) {
       logger.info("Config file changed")
       do {
         try Config.load()
         logger.info("Config file reloaded")
       } catch {
         logger.error("Unable to reload configuration file: \(error.localizedDescription)")
-        let alert = NSAlert()
-        alert.messageText = "Unable to load configuration file"
-        alert
-          .informativeText =
-          "Unable to load configuration file: \(error.localizedDescription) The built-in defaults will be used instead."
-        alert.addButton(withTitle: "OK")
-        alert.alertStyle = .warning
-        alert.runModal()
+        ConfigParseAlert(error: error).runModal()
       }
     }
 

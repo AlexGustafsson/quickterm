@@ -200,14 +200,7 @@ do {
   if isatty(0) == 1 {
     print("Unable to load configuration file: \(error.localizedDescription) Using defaults.", to: &stderr)
   } else {
-    let alert = NSAlert()
-    alert.messageText = "Unable to load configuration file"
-    alert
-      .informativeText =
-      "Unable to load configuration file: \(error.localizedDescription) The built-in defaults will be used instead."
-    alert.addButton(withTitle: "OK")
-    alert.alertStyle = .warning
-    alert.runModal()
+    ConfigParseAlert(error: error).runModal()
   }
 }
 

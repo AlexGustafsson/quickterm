@@ -1,5 +1,17 @@
 import Foundation
+import AppKit
 import Yams
+
+class ConfigParseAlert: NSAlert {
+  init(error: Error) {
+    super.init()
+    self.messageText = "Unable to load configuration file"
+    self.informativeText =
+    "Unable to load configuration file: \(error.localizedDescription) The built-in defaults will be used instead."
+    self.addButton(withTitle: "OK")
+    self.alertStyle = .warning
+  }
+}
 
 class Config {
   struct HotKeyValues: Codable {
@@ -27,14 +39,22 @@ class Config {
     self.user ?? self.main
   }
 
+  public static var directory: URL {
+    var path = FileManager.default.homeDirectoryForCurrentUser
+    path.appendPathComponent(".config", isDirectory: true)
+    path.appendPathComponent("quickterm", isDirectory: true)
+    return path
+  }
+
+  public static var filePath: URL {
+    var path = self.directory
+    path.appendPathComponent("config.yml", isDirectory: false)
+    return path
+  }
+
   class func load() throws {
     // Load ~/.config/quickterm/config.yml
-    var configFile = FileManager.default.homeDirectoryForCurrentUser
-    configFile.appendPathComponent(".config", isDirectory: true)
-    configFile.appendPathComponent("quickterm", isDirectory: true)
-    configFile.appendPathComponent("config.yml", isDirectory: false)
-
-    let data = try Data(contentsOf: configFile, options: [])
+    let data = try Data(contentsOf: self.filePath, options: [])
     let decoder = YAMLDecoder()
     self.user = try decoder.decode(ConfigValues.self, from: data)
     logger.debug("Loaded user config values")
@@ -42,22 +62,17 @@ class Config {
 
   class func dump() throws {
     // Create ~/.config/quickterm if it does not exist
-    var configDirectory = FileManager.default.homeDirectoryForCurrentUser
-    configDirectory.appendPathComponent(".config", isDirectory: true)
-    configDirectory.appendPathComponent("quickterm", isDirectory: true)
     try FileManager.default.createDirectory(
-      atPath: configDirectory.path,
+      atPath: self.directory.path,
       withIntermediateDirectories: true,
       attributes: nil
     )
 
     // Create ~/.config/quickterm/config.yml if it does not exist
-    var configFile = configDirectory
-    configFile.appendPathComponent("config.yml")
-    if !FileManager.default.fileExists(atPath: configFile.path) {
+    if !FileManager.default.fileExists(atPath: self.filePath.path) {
       let encoder = YAMLEncoder()
       let data = try encoder.encode(self.main)
-      try data.write(to: configFile, atomically: false, encoding: .utf8)
+      try data.write(to: self.filePath, atomically: false, encoding: .utf8)
     }
   }
 }
