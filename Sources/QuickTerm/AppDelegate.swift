@@ -4,11 +4,10 @@ import QuickTermShared
 import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+  private var menu: QuickTermMenu?
+
   private let notificationViewController: NotificationViewController!
   private let inputViewController: InputViewController!
-
-  private var statusItem: NSStatusItem!
-  private let applicationName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? ""
 
   private let sessionManager: TerminalSessionManager!
 
@@ -40,39 +39,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   func applicationDidFinishLaunching(_ aNotification: Notification) {
-    let statusBar = NSStatusBar.system
-    statusItem = statusBar.statusItem(withLength: NSStatusItem.variableLength)
-    statusItem.button?.title = "⌘"
-    // item?.button?.image = NSImage(named: "MenuBarIcon-Normal")!
-    // item?.button?.alternateImage = NSImage(named: "MenuBarIcon-Selected")!
+    self.menu = self.createMenu()
 
     self.notificationViewController.show()
-
-    let menu = NSMenu()
-
-    menu.addItem(NSMenuItem(title: "About \(applicationName)", action: #selector(self.handleAbout), keyEquivalent: ""))
-    menu.addItem(NSMenuItem.separator())
-    menu.addItem(
-      NSMenuItem(
-        title: "Show Command Entry",
-        action: #selector(self.handleCommandEntry),
-        keyEquivalent: "t",
-        keyEquivalentModifierMask: [NSEvent.ModifierFlags.command, NSEvent.ModifierFlags.option]
-      )
-    )
-    menu.addItem(NSMenuItem.separator())
-    menu.addItem(
-      NSMenuItem(
-        title: "Open Configuration File",
-        action: #selector(self.openConfigurationFile),
-        keyEquivalent: ""
-      )
-    )
-    menu.addItem(
-      NSMenuItem(title: "Quit \(applicationName)", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "")
-    )
-
-    statusItem.menu = menu
 
     executor.onExecuteCommand = {
       configuration in
@@ -104,7 +73,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     logger.info("Registering global hotkey")
 
     self.commandEntryHotKey.keyDownHandler = {
-      self.handleCommandEntry()
+      self.inputViewController.show()
     }
 
     self.inputViewController.onExecuteCommand = {
@@ -145,23 +114,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         alert.runModal()
       }
     }
+
+    self.menu = self.createMenu()
   }
 
-  @objc func handleAbout() {
-    let viewController = AboutViewController()
-    viewController.show()
-  }
-
-  @objc func handleCommandEntry() {
-    self.inputViewController.show()
-  }
-
-  @objc func openConfigurationFile() {
-    var configFile = FileManager.default.homeDirectoryForCurrentUser
-    configFile.appendPathComponent(".config", isDirectory: true)
-    configFile.appendPathComponent("quickterm", isDirectory: true)
-    configFile.appendPathComponent("config.yml")
-    NSWorkspace.shared.openFile(configFile.path)
+  private func createMenu() -> QuickTermMenu {
+    let menu = QuickTermMenu()
+    menu.onQuit = {
+      NSApplication.shared.terminate(nil)
+    }
+    menu.onShowAbout = {
+      let viewController = AboutViewController()
+      viewController.show()
+    }
+    menu.onShowCommandEntry = {
+      self.inputViewController.show()
+    }
+    menu.onOpenConfigurationFile = {
+      var configFile = FileManager.default.homeDirectoryForCurrentUser
+      configFile.appendPathComponent(".config", isDirectory: true)
+      configFile.appendPathComponent("quickterm", isDirectory: true)
+      configFile.appendPathComponent("config.yml")
+      NSWorkspace.shared.openFile(configFile.path)
+    }
+    return menu
   }
 
   func applicationWillTerminate(_ aNotification: Notification) {
