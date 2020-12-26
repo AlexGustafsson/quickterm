@@ -1,5 +1,7 @@
 # file options
 
+--exclude build
+
 # format options
 
 --allman false

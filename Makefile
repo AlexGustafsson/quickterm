@@ -56,12 +56,12 @@ setup-git-hooks: .githooks/pre-commit
 # Lint all Swift code
 # Requires swiftformat: brew install swiftformat
 lint:
-	swiftformat --lint --verbose --config .swiftformat .
+	swiftformat --lint --verbose --config .swiftformat --cache ignore .
 
 # Format all Swift code
 # Requires swiftformat: brew install swiftformat
 format:
-	swiftformat --config .swiftformat .
+	swiftformat --config .swiftformat --cache ignore .
 
 # Package the application, ready for distribution. Does not sign the binaries.
 # To package signed binaries run "make build sign package" instead
