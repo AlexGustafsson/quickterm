@@ -122,11 +122,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       self.inputViewController.show()
     }
     menu.onOpenConfigurationFile = {
-      var configFile = FileManager.default.homeDirectoryForCurrentUser
-      configFile.appendPathComponent(".config", isDirectory: true)
-      configFile.appendPathComponent("quickterm", isDirectory: true)
-      configFile.appendPathComponent("config.yml")
-      NSWorkspace.shared.openFile(configFile.path)
+      NSWorkspace.shared.open(Config.filePath)
     }
     return menu
   }
