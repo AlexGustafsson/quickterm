@@ -11,7 +11,6 @@ CC=clang
 modules=QuickTerm QuickTermBroker
 sharedModules=QuickTermShared QuickTermLibrary
 
-sourceToLint := $(shell find Sources -type f -name "*.swift")
 sharedSource := $(shell echo $(sharedModules) | tr ' ' '\n' | while read line; do find "Sources/$$line" -type f -iname '*.swift'; done)
 
 version := $(shell grep 'CFBundleShortVersionString' -A1 SupportingFiles/QuickTerm/Info.plist | tail -1 | sed 's/.*<string>\([^<]\+\)<\/string>.*/\1/')
@@ -48,14 +47,14 @@ test:
 	swift test --build-path "build/test"
 
 # Lint all Swift code
-# Requires swift-format: brew install swift-format
+# Requires swiftformat: brew install swiftformat
 lint:
-	swift-format --mode lint --configuration swift-format.json --recursive .
+	swiftformat --lint --verbose --config .swiftformat .
 
 # Format all Swift code
-# Requires swift-format: brew install swift-format
+# Requires swiftformat: brew install swiftformat
 format:
-	swift-format --mode format --configuration swift-format.json --in-place --recursive .
+	swiftformat --config .swiftformat .
 
 # Package the application, ready for distribution. Does not sign the binaries.
 # To package signed binaries run "make build sign package" instead

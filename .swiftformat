@@ -1,0 +1,39 @@
+# file options
+
+# format options
+
+--allman false
+--binarygrouping 4,8
+--commas always
+--comments indent
+--decimalgrouping 3,6
+--elseposition same-line
+--empty void
+--exponentcase lowercase
+--exponentgrouping disabled
+--fractiongrouping disabled
+--header ignore
+--hexgrouping 4,8
+--hexliteralcase lowercase
+--ifdef indent
+--indent 2
+--indentcase false
+--importgrouping testable-bottom
+--linebreaks lf
+--maxwidth 120
+--octalgrouping 4,8
+--operatorfunc spaced
+--patternlet hoist
+--ranges spaced
+--self insert
+--semicolons inline
+--stripunusedargs always
+--swiftversion 5.3
+--trimwhitespace always
+--wraparguments before-first
+--wrapcollections before-first
+--modifierorder public,override
+
+# rules
+
+--enable isEmpty
