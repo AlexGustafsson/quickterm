@@ -7,7 +7,7 @@ import SwiftUI
 class ExplicitFontTextFieldCell: NSTextFieldCell {
   override var font: NSFont? {
     get {
-      return super.font
+      super.font
     }
     set {
       // Do nothing, use realFont instead
@@ -36,7 +36,7 @@ class ExplicitFontTextField: NSTextField {
 
   override var font: NSFont? {
     get {
-      return super.font
+      super.font
     }
     set {
       // Do nothing, use realFont instead
@@ -51,7 +51,7 @@ class ExplicitFontTextField: NSTextField {
 
   override func performKeyEquivalent(with event: NSEvent) -> Bool {
     if event.type == NSEvent.EventType.keyDown {
-      if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue) == commandKey {
+      if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue) == self.commandKey {
         switch event.charactersIgnoringModifiers! {
         case "x":
           if NSApp.sendAction(#selector(NSText.cut(_:)), to: nil, from: self) { return true }
@@ -67,12 +67,13 @@ class ExplicitFontTextField: NSTextField {
           break
         }
       } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue)
-        == commandShiftKey
+        == self.commandShiftKey
       {
         if event.charactersIgnoringModifiers == "Z" {
           if NSApp.sendAction(Selector(("redo:")), to: nil, from: self) { return true }
         }
-      } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue) == controlKey
+      } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue) == self
+        .controlKey
       {
         // Like ctrl+c in a terminal - abort the command entry
         self.stringValue = ""
@@ -121,7 +122,7 @@ struct SpotlightTextField: NSViewRepresentable {
     textField.delegate = context.coordinator
     textField.isEditable = true
     textField.isSelectable = true
-    textField.stringValue = text
+    textField.stringValue = self.text
     textField.placeholderString = self.placeholder
     textField.isBordered = false
     textField.backgroundColor = .clear
@@ -132,7 +133,7 @@ struct SpotlightTextField: NSViewRepresentable {
     return textField
   }
 
-  func updateNSView(_ textField: NSTextField, context: Context) {
+  func updateNSView(_ textField: NSTextField, context _: Context) {
     textField.stringValue = self.text
     if self.becomeFirstResponder {
       DispatchQueue.main.async {
@@ -148,12 +149,10 @@ struct SpotlightTextField: NSViewRepresentable {
   }
 
   func makeCoordinator() -> SpotlightTextField.Coordinator {
-    return Coordinator(parent: self)
+    Coordinator(parent: self)
   }
 
-  func onTab() {
-
-  }
+  func onTab() {}
 
   func onPreviousInHistory() {
     if self.historyIndex >= self.commandHistoryManager.items.count - 1 {
@@ -196,7 +195,7 @@ struct SpotlightTextField: NSViewRepresentable {
       self.parent.text = textField.stringValue
     }
 
-    func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+    func control(_: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
       if commandSelector == #selector(NSResponder.insertNewline(_:)) {
         self.parent.onCommit(textView.string)
         self.parent.text = ""

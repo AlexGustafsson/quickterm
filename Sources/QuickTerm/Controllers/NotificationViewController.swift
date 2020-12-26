@@ -6,36 +6,36 @@ class NotificationHostingView: NSHostingView<ContentView> {
   typealias FocusChangedCallback = (Bool) -> Void
   var onFocusChanged: FocusChangedCallback = { _ in }
 
-  private var trackingArea: NSTrackingArea = NSTrackingArea()
+  private var trackingArea = NSTrackingArea()
 
-  override func viewWillMove(toWindow newWindow: NSWindow?) {
+  override func viewWillMove(toWindow _: NSWindow?) {
     // Setup a new tracking area when the view is added to the window.
-    trackingArea = NSTrackingArea(
+    self.trackingArea = NSTrackingArea(
       rect: self.bounds,
       options: [.mouseEnteredAndExited, .activeAlways],
       owner: self,
       userInfo: nil
     )
-    self.addTrackingArea(trackingArea)
+    self.addTrackingArea(self.trackingArea)
   }
 
   override func updateTrackingAreas() {
-    self.removeTrackingArea(trackingArea)
+    self.removeTrackingArea(self.trackingArea)
 
-    trackingArea = NSTrackingArea(
+    self.trackingArea = NSTrackingArea(
       rect: self.bounds,
       options: [.mouseEnteredAndExited, .activeAlways],
       owner: self,
       userInfo: nil
     )
-    self.addTrackingArea(trackingArea)
+    self.addTrackingArea(self.trackingArea)
   }
 
-  override func mouseEntered(with event: NSEvent) {
+  override func mouseEntered(with _: NSEvent) {
     self.onFocusChanged(true)
   }
 
-  override func mouseExited(with event: NSEvent) {
+  override func mouseExited(with _: NSEvent) {
     self.onFocusChanged(false)
   }
 }

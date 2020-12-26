@@ -15,7 +15,7 @@ let package = Package(
   dependencies: [
     .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.0")),
     .package(url: "https://github.com/soffes/HotKey", from: "0.1.3"),
-    .package(url: "https://github.com/jpsim/Yams.git", from: "4.0.3")
+    .package(url: "https://github.com/jpsim/Yams.git", from: "4.0.3"),
   ],
   targets: [
     .target(
@@ -31,13 +31,13 @@ let package = Package(
         .unsafeFlags([
           "-Xlinker", "-sectcreate", "-Xlinker", "__TEXT", "-Xlinker", "__info_plist", "-Xlinker",
           "./SupportingFiles/QuickTerm/Info.plist",
-        ])
+        ]),
       ]
     ),
     .target(
       name: "QuickTermLibrary",
       dependencies: [
-        "QuickTermShared"
+        "QuickTermShared",
       ]
     ),
     .testTarget(
@@ -51,7 +51,7 @@ let package = Package(
         .unsafeFlags([
           "-Xlinker", "-sectcreate", "-Xlinker", "__TEXT", "-Xlinker", "__info_plist", "-Xlinker",
           "./SupportingFiles/QuickTermBroker/Info.plist",
-        ])
+        ]),
       ]
     ),
     .target(

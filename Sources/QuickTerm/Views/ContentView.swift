@@ -13,10 +13,10 @@ struct ContentView: View {
             NotificationView(session: session)
           }
         }
-        Spacer()  // Force items up towards the top
+        Spacer() // Force items up towards the top
       }
       .padding(.init(top: 15, leading: 15, bottom: 73, trailing: 5)).transition(AnyTransition.slide).animation(.default)
-      .frame(width: geometry.size.width, height: geometry.size.height)  // Force same size as window
+      .frame(width: geometry.size.width, height: geometry.size.height) // Force same size as window
     }
   }
 }

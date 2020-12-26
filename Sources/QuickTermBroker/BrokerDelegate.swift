@@ -8,10 +8,10 @@ class BrokerDelegate: NSObject, NSXPCListenerDelegate {
     self.broker = broker
   }
 
-  func listener(_ listener: NSXPCListener, shouldAcceptNewConnection newConnection: NSXPCConnection) -> Bool {
+  func listener(_: NSXPCListener, shouldAcceptNewConnection newConnection: NSXPCConnection) -> Bool {
     logger.info("Accepting connection")
     newConnection.exportedInterface = NSXPCInterface(with: BrokerProtocol.self)
-    newConnection.exportedObject = broker
+    newConnection.exportedObject = self.broker
     newConnection.resume()
     return true
   }

@@ -1,7 +1,7 @@
 import Foundation
 import Yams
 
-class Config  {
+class Config {
   struct HotKeyValues: Codable {
     var showCommandEntry: String = "option+cmd+t"
   }
@@ -17,16 +17,14 @@ class Config  {
   }
 
   struct ConfigValues: Codable {
-    var commandConfiguration: CommandConfigurationValues = CommandConfigurationValues()
-    var hotkeys: HotKeyValues = HotKeyValues()
+    var commandConfiguration = CommandConfigurationValues()
+    var hotkeys = HotKeyValues()
   }
 
-  static private(set) var main: ConfigValues = ConfigValues()
-  static private(set) var user: ConfigValues?
-  static public var current: ConfigValues {
-    get {
-      return self.user ?? self.main
-    }
+  private(set) static var main = ConfigValues()
+  private(set) static var user: ConfigValues?
+  public static var current: ConfigValues {
+    self.user ?? self.main
   }
 
   class func load() throws {
@@ -47,7 +45,11 @@ class Config  {
     var configDirectory = FileManager.default.homeDirectoryForCurrentUser
     configDirectory.appendPathComponent(".config", isDirectory: true)
     configDirectory.appendPathComponent("quickterm", isDirectory: true)
-    try FileManager.default.createDirectory(atPath: configDirectory.path, withIntermediateDirectories: true, attributes: nil)
+    try FileManager.default.createDirectory(
+      atPath: configDirectory.path,
+      withIntermediateDirectories: true,
+      attributes: nil
+    )
 
     // Create ~/.config/quickterm/config.yml if it does not exist
     var configFile = configDirectory

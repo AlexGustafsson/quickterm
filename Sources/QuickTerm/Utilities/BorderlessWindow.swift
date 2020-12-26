@@ -18,12 +18,12 @@ struct Guideline {
     case vertical
   }
 
-  public func snap(_ point: inout CGPoint)  {
-    if self.orientation == .horizontal && abs(point.y - self.y) <= self.threshold {
+  public func snap(_ point: inout CGPoint) {
+    if self.orientation == .horizontal, abs(point.y - self.y) <= self.threshold {
       point.y = self.y
     }
 
-    if self.orientation == .vertical && abs(point.x - self.x) <= self.threshold {
+    if self.orientation == .vertical, abs(point.x - self.x) <= self.threshold {
       point.x = self.x
     }
   }

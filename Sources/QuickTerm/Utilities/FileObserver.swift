@@ -7,7 +7,7 @@ class FileObserver: NSObject, NSFilePresenter {
   typealias FileChangedCallback = () -> Void
   let onFileChanged: FileChangedCallback
 
-  init(_ file: URL, callback: @escaping () -> ()) {
+  init(_ file: URL, callback: @escaping () -> Void) {
     self.presentedItemURL = file
     self.onFileChanged = callback
     super.init()

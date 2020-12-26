@@ -1,8 +1,8 @@
 import AppKit
 import ArgumentParser
 import Foundation
-import QuickTermShared
 import os
+import QuickTermShared
 
 let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "main")
 var stderr = FileHandle.standardError
@@ -84,7 +84,7 @@ struct Quick: ParsableCommand {
 
   @Flag(
     help:
-      "Whether or not the output should be animated as it's received. Does not work with --wait-for-exit as the output is fully available when shown"
+    "Whether or not the output should be animated as it's received. Does not work with --wait-for-exit as the output is fully available when shown"
   )
   var animate: Bool = Config.current.commandConfiguration.animate
 
@@ -126,11 +126,11 @@ struct Quick: ParsableCommand {
   private let isInTTY: Bool = isatty(0) == 1
 
   func validate() throws {
-    if help && arguments.count == 0 {
+    if self.help, self.arguments.isEmpty {
       throw CleanExit.helpRequest()
     }
 
-    if printConfigPath && arguments.count == 0 {
+    if self.printConfigPath, self.arguments.isEmpty {
       var configFile = FileManager.default.homeDirectoryForCurrentUser
       configFile.appendPathComponent(".config", isDirectory: true)
       configFile.appendPathComponent("quickterm", isDirectory: true)
@@ -139,37 +139,37 @@ struct Quick: ParsableCommand {
       throw ExitCode(0)
     }
 
-    guard timeout >= 0 else {
+    guard self.timeout >= 0 else {
       throw ValidationError("'timeout' must be larger than or equal to 0")
     }
 
-    guard delayAfterExit >= 0 else {
+    guard self.delayAfterExit >= 0 else {
       throw ValidationError("'delay-after-exit' must be larger than or equal to 0")
     }
   }
 
   func run() throws {
-    let command = arguments.joined(separator: " ")
+    let command = self.arguments.joined(separator: " ")
     if let daemon = findDaemon() {
       if command == "" {
         logger.error("Tried to start daemon when it was already running")
         print("Daemon is already running", to: &stderr)
         throw ExitCode(1)
       } else {
-        let workingDirectory: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+        let workingDirectory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
         let commandConfiguration = QuickTermShared.CommandConfiguration(
           workingDirectory: workingDirectory,
           command: command,
-          shell: shell,
-          timeout: timeout,
-          keep: keep,
+          shell: self.shell,
+          timeout: self.timeout,
+          keep: self.keep,
           startTime: Date(),
-          animate: animate,
-          waitForExit: waitForExit,
-          sourceBashProfile: !noBashProfile,
-          delayAfterExit: delayAfterExit
+          animate: self.animate,
+          waitForExit: self.waitForExit,
+          sourceBashProfile: !self.noBashProfile,
+          delayAfterExit: self.delayAfterExit
         )
-        if dump {
+        if self.dump {
           let json = try commandConfiguration.dump()
           print(json)
         } else {
@@ -178,7 +178,7 @@ struct Quick: ParsableCommand {
       }
     } else {
       if command == "" {
-        try startApplication(isInTTY: isInTTY)
+        try startApplication(isInTTY: self.isInTTY)
       } else {
         print("Daemon is not running", to: &stderr)
         throw ExitCode(1)
@@ -189,20 +189,22 @@ struct Quick: ParsableCommand {
 
 do {
   try Config.dump()
-} catch let error {
+} catch {
   logger.error("Unable to create configuration file: \(error.localizedDescription)")
 }
 
 do {
   try Config.load()
-} catch let error {
+} catch {
   logger.error("Unable to load configuration file: \(error.localizedDescription)")
   if isatty(0) == 1 {
     print("Unable to load configuration file: \(error.localizedDescription) Using defaults.", to: &stderr)
   } else {
     let alert = NSAlert()
     alert.messageText = "Unable to load configuration file"
-    alert.informativeText = "Unable to load configuration file: \(error.localizedDescription) The built-in defaults will be used instead."
+    alert
+      .informativeText =
+      "Unable to load configuration file: \(error.localizedDescription) The built-in defaults will be used instead."
     alert.addButton(withTitle: "OK")
     alert.alertStyle = .warning
     alert.runModal()

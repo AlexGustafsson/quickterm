@@ -7,7 +7,7 @@ class CommandExecutor: CommandExecutorProtocol {
 
   func queueCommand(_ configuration: CommandConfiguration) {
     logger.info("Got request to execute command, calling listeners")
-    onExecuteCommand(configuration)
+    self.onExecuteCommand(configuration)
   }
 }
 
@@ -18,7 +18,7 @@ class CommandExecutorDelegate: NSObject, NSXPCListenerDelegate {
     self.executor = executor
   }
 
-  func listener(_ listener: NSXPCListener, shouldAcceptNewConnection connection: NSXPCConnection) -> Bool {
+  func listener(_: NSXPCListener, shouldAcceptNewConnection connection: NSXPCConnection) -> Bool {
     logger.info("Accepting connection")
     let interface = NSXPCInterface(with: CommandExecutorProtocol.self)
     interface.setClasses(

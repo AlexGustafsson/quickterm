@@ -6,7 +6,7 @@ class InputViewController {
   private let commandHistoryManager: CommandHistoryManager
   private var inputView: InputView!
   private let window: BorderlessWindow!
-  private var previousApp: NSRunningApplication? = nil
+  private var previousApp: NSRunningApplication?
 
   typealias ExecuteCallback = (_ command: String) -> Void
   public var onExecuteCommand: ExecuteCallback = { _ in }
@@ -48,7 +48,11 @@ class InputViewController {
     self.window.guidelines.append(verticalCenter)
 
     self.commandHistoryManager = CommandHistoryManager()
-    self.inputView = InputView(commandHistoryManager: commandHistoryManager, onCommit: onCommit, onCancel: onCancel)
+    self.inputView = InputView(
+      commandHistoryManager: self.commandHistoryManager,
+      onCommit: self.onCommit,
+      onCancel: self.onCancel
+    )
     self.window.contentView = NSHostingView(rootView: self.inputView)
 
     NotificationCenter.default.addObserver(
@@ -65,7 +69,7 @@ class InputViewController {
 
   func onCommit(command: String) {
     logger.debug("Commiting command '\(command, privacy: .public)'")
-    if command.count > 0 {
+    if !command.isEmpty {
       self.onExecuteCommand(command)
       self.commandHistoryManager.append(CommandHistoryItem(command))
     }

@@ -10,6 +10,6 @@ final class QuickTermLibraryTests: XCTestCase {
   }
 
   static var allTests = [
-    ("Parse ANSI codes", parseAnsiCodes)
+    ("Parse ANSI codes", parseAnsiCodes),
   ]
 }

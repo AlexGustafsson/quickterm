@@ -2,8 +2,8 @@ import Foundation
 import QuickTermShared
 
 @objc class Broker: NSObject, BrokerProtocol {
-  private var executorConnection: NSXPCConnection? = nil
-  private var executor: CommandExecutorProtocol? = nil
+  private var executorConnection: NSXPCConnection?
+  private var executor: CommandExecutorProtocol?
 
   func registerCommandExecutor(client endpoint: NSXPCListenerEndpoint) {
     logger.info("Registering a command executor")

@@ -1,6 +1,6 @@
 import Foundation
-import QuickTermShared
 import os
+import QuickTermShared
 
 class TerminalSession: Identifiable, ObservableObject, Equatable {
   typealias ActiveChangedCallback = (TerminalSession) -> Void
@@ -39,7 +39,7 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
     process = Process()
     process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
     var command: String = configuration.command
-    if configuration.shell == "bash" && configuration.sourceBashProfile {
+    if configuration.shell == "bash", configuration.sourceBashProfile {
       command = "shopt -s expand_aliases;source ~/.bash_profile\n" + command
     }
     process.arguments = [configuration.shell, "-c", command]
@@ -49,8 +49,8 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
 
     logger.debug("Creating stdout pipe")
     self.stdout = Pipe()
-    self.process.standardOutput = stdout
-    self.stdoutHandle = stdout.fileHandleForReading
+    self.process.standardOutput = self.stdout
+    self.stdoutHandle = self.stdout.fileHandleForReading
     DispatchQueue.main.async {
       self.stdoutHandle.waitForDataInBackgroundAndNotify()
     }
@@ -65,8 +65,8 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
 
     logger.debug("Creating stderr pipe")
     self.stderr = Pipe()
-    self.process.standardError = stderr
-    self.stderrHandle = stderr.fileHandleForReading
+    self.process.standardError = self.stderr
+    self.stderrHandle = self.stderr.fileHandleForReading
     DispatchQueue.main.async {
       self.stderrHandle.waitForDataInBackgroundAndNotify()
     }
@@ -82,7 +82,7 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
 
   public func start() throws {
     logger.info("Starting session \(self.id, privacy: .public)")
-    if !self.isRunning && !self.hasFinished {
+    if !self.isRunning, !self.hasFinished {
       self.isRunning = true
       self.process.terminationHandler = {
         _ in
@@ -109,13 +109,13 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
   @objc private func onStdoutDataAvailable() {
     let data = self.stdoutHandle.availableData
 
-    if data.count > 0 {
+    if !data.isEmpty {
       if let output = String(data: data, encoding: String.Encoding.utf8) {
         logger.debug("Got output data \(output)")
         self.stdoutOutput += output
         self.output += output
       }
-      stdoutHandle.waitForDataInBackgroundAndNotify()
+      self.stdoutHandle.waitForDataInBackgroundAndNotify()
     } else {
       logger.debug("Received EOF")
     }
@@ -124,13 +124,13 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
   @objc private func onStderrDataAvailable() {
     let data = self.stderrHandle.availableData
 
-    if data.count > 0 {
+    if !data.isEmpty {
       if let output = String(data: data, encoding: String.Encoding.utf8) {
         logger.debug("Got output data \(output)")
         self.stderrOutput += output
         self.output += output
       }
-      stderrHandle.waitForDataInBackgroundAndNotify()
+      self.stderrHandle.waitForDataInBackgroundAndNotify()
     } else {
       logger.debug("Received EOF")
     }

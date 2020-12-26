@@ -7,10 +7,10 @@ class QuickTermMenu: NSObject {
   private let applicationName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? ""
 
   typealias MenuItemClickedCallback = () -> Void
-  var onShowAbout: MenuItemClickedCallback = { }
-  var onShowCommandEntry: MenuItemClickedCallback = { }
-  var onOpenConfigurationFile: MenuItemClickedCallback = { }
-  var onQuit: MenuItemClickedCallback = { }
+  var onShowAbout: MenuItemClickedCallback = {}
+  var onShowCommandEntry: MenuItemClickedCallback = {}
+  var onOpenConfigurationFile: MenuItemClickedCallback = {}
+  var onQuit: MenuItemClickedCallback = {}
 
   override init() {
     super.init()
@@ -21,7 +21,13 @@ class QuickTermMenu: NSObject {
     self.menu = NSMenu()
 
     // About QuickTerm
-    self.menu.addItem(NSMenuItem(title: "About \(self.applicationName)", action: #selector(self.showAbout), target: self, keyEquivalent: ""))
+    self.menu
+      .addItem(NSMenuItem(
+        title: "About \(self.applicationName)",
+        action: #selector(self.showAbout),
+        target: self,
+        keyEquivalent: ""
+      ))
     // --
     self.menu.addItem(NSMenuItem.separator())
     // Show Command Entry
@@ -47,7 +53,7 @@ class QuickTermMenu: NSObject {
     )
     // Quit QuickTerm
     self.menu.addItem(
-      NSMenuItem(title: "Quit \(applicationName)", action: #selector(self.quit), target: self, keyEquivalent: "")
+      NSMenuItem(title: "Quit \(self.applicationName)", action: #selector(self.quit), target: self, keyEquivalent: "")
     )
 
     self.statusItem.menu = self.menu

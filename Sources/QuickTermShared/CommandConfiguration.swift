@@ -1,7 +1,7 @@
 import Foundation
 
 @objc public class CommandConfiguration: NSObject, NSSecureCoding, Codable {
-  public static var supportsSecureCoding: Bool { return true }
+  public static var supportsSecureCoding: Bool { true }
 
   // The directory to execute the command in.
   public let workingDirectory: URL!

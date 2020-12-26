@@ -1,6 +1,6 @@
 import Foundation
-import QuickTermShared
 import os
+import QuickTermShared
 
 let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "broker")
 

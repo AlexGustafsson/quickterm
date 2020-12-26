@@ -32,18 +32,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     self.executor = CommandExecutor()
 
-    self.delegate = CommandExecutorDelegate(executor: executor)
+    self.delegate = CommandExecutorDelegate(executor: self.executor)
     self.listener.delegate = self.delegate
 
     self.commandEntryHotKey = HotKey(key: .t, modifiers: [.command, .option])
   }
 
-  func applicationDidFinishLaunching(_ aNotification: Notification) {
+  func applicationDidFinishLaunching(_: Notification) {
     self.menu = self.createMenu()
 
     self.notificationViewController.show()
 
-    executor.onExecuteCommand = {
+    self.executor.onExecuteCommand = {
       configuration in
       let session = TerminalSession(configuration)
       self.sessionManager.schedule(session)
@@ -78,7 +78,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     self.inputViewController.onExecuteCommand = {
       command in
-      let workingDirectory: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+      let workingDirectory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
       let configuration = QuickTermShared.CommandConfiguration(
         workingDirectory: workingDirectory,
         command: command,
@@ -104,11 +104,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       do {
         try Config.load()
         logger.info("Config file reloaded")
-      } catch let error {
+      } catch {
         logger.error("Unable to reload configuration file: \(error.localizedDescription)")
         let alert = NSAlert()
         alert.messageText = "Unable to load configuration file"
-        alert.informativeText = "Unable to load configuration file: \(error.localizedDescription) The built-in defaults will be used instead."
+        alert
+          .informativeText =
+          "Unable to load configuration file: \(error.localizedDescription) The built-in defaults will be used instead."
         alert.addButton(withTitle: "OK")
         alert.alertStyle = .warning
         alert.runModal()
@@ -140,9 +142,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     return menu
   }
 
-  func applicationWillTerminate(_ aNotification: Notification) {
+  func applicationWillTerminate(_: Notification) {
     // Insert code here to tear down your application
   }
 
-  func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { return false }
+  func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool { false }
 }
