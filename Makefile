@@ -6,7 +6,7 @@ CXX=clang
 CPP=clang
 CC=clang
 
-.PHONY: build run test lint format package sign logs help clean
+.PHONY: build run setup setup-git-hooks test lint format package sign logs help clean
 
 modules=QuickTerm QuickTermBroker
 sharedModules=QuickTermShared QuickTermLibrary
@@ -45,6 +45,13 @@ endif
 # Run all tests
 test:
 	swift test --build-path "build/test"
+
+# Setup the project for development
+setup: setup-git-hooks
+
+# Install the recommended git hooks
+setup-git-hooks: .githooks/pre-commit
+	cp .githooks/* .git/hooks
 
 # Lint all Swift code
 # Requires swiftformat: brew install swiftformat

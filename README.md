@@ -258,6 +258,9 @@ git clone https://github.com/AlexGustafsson/quickterm.git && cd quickterm
 make
 make help
 
+# Setup the project for development (installs git hooks)
+make setup
+
 # Run the application (UI)
 make run
 

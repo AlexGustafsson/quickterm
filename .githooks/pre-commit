@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+errors=0
+
+# Define SKIP_SWIFT_FORMAT to skip
+if [[ -z "$SKIP_SWIFT_FORMAT" ]]; then
+	swiftformat --lint --quiet --config .swiftformat . &>/dev/null
+	if [[ ! $? -eq 0 ]]; then
+		echo "There's one or more lint errors" 1>&2
+		echo -e "Run \e[1mmake lint\e[0m to view them" 1>&2
+		echo -e "Run \e[1mmake format\e[0m to fix them" 1>&2
+		echo -e "Run \e[1mSKIP_SWIFT_FORMAT=yes git commit ...\e[0m to ignore them" 1>&2
+		errors=$(($errors + 1))
+	fi
+fi
+
+if [[ $errors -gt 0 ]]; then
+	exit 1
+fi
