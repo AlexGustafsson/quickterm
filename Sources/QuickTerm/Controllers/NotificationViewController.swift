@@ -61,7 +61,7 @@ class NotificationViewController {
       height: mainScreen.visibleFrame.height
     )
 
-    var hostingView = NotificationHostingView(rootView: contentView)
+    let hostingView = NotificationHostingView(rootView: contentView)
     hostingView.onFocusChanged = {
       focus in
       if focus {

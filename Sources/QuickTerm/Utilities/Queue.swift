@@ -9,7 +9,7 @@ public struct Queue<T> {
   private var head = 0
 
   public var isEmpty: Bool {
-    self.isEmpty
+    (self.array.count - self.head) == 0
   }
 
   public var count: Int {

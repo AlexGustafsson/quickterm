@@ -1,5 +1,5 @@
-import Foundation
 import AppKit
+import Foundation
 import Yams
 
 class ConfigParseAlert: NSAlert {
@@ -7,7 +7,7 @@ class ConfigParseAlert: NSAlert {
     super.init()
     self.messageText = "Unable to load configuration file"
     self.informativeText =
-    "Unable to load configuration file: \(error.localizedDescription) The built-in defaults will be used instead."
+      "Unable to load configuration file: \(error.localizedDescription) The built-in defaults will be used instead."
     self.addButton(withTitle: "OK")
     self.alertStyle = .warning
   }

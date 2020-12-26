@@ -7,16 +7,16 @@ import QuickTermShared
 let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "main")
 var stderr = FileHandle.standardError
 
-func findDaemon() -> NSRunningApplication? {
+func daemonExists() -> Bool {
   let bundleIdentifier = Bundle.main.bundleIdentifier!
   let apps = NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier)
   for app in apps {
     if app != NSRunningApplication.current {
-      return app
+      return true
     }
   }
 
-  return nil
+  return false
 }
 
 func startApplication(isInTTY: Bool) throws {
@@ -123,8 +123,6 @@ struct Quick: ParsableCommand {
   )
   var arguments: [String] = []
 
-  private let isInTTY: Bool = isatty(0) == 1
-
   func validate() throws {
     if self.help, self.arguments.isEmpty {
       throw CleanExit.helpRequest()
@@ -150,7 +148,7 @@ struct Quick: ParsableCommand {
 
   func run() throws {
     let command = self.arguments.joined(separator: " ")
-    if let daemon = findDaemon() {
+    if daemonExists() {
       if command == "" {
         logger.error("Tried to start daemon when it was already running")
         print("Daemon is already running", to: &stderr)
@@ -178,7 +176,7 @@ struct Quick: ParsableCommand {
       }
     } else {
       if command == "" {
-        try startApplication(isInTTY: self.isInTTY)
+        try startApplication(isInTTY: isatty(0) == 1)
       } else {
         print("Daemon is not running", to: &stderr)
         throw ExitCode(1)
