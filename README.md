@@ -68,6 +68,8 @@ A global hotkey is also available to easily run commands from anywhere. Simply p
 * Automatic dark mode
 * Spotlight-like input with command history
 * Tab-completion and auto complete (upcoming)
+* Completely configurable with automatic reload
+* Configurable, global hotkey for quick access
 
 <a id="installation"></a>
 ## Installation
