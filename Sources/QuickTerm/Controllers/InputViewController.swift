@@ -1,102 +1,86 @@
 import AppKit
+import QuickTermLibrary
 import QuickTermShared
 import SwiftUI
 
-class InputViewController {
-  private let commandHistoryManager: CommandHistoryManager
-  private let completionManager: CompletionManager
-  private var inputView: InputView!
-  private let window: BorderlessWindow!
-  private var previousApp: NSRunningApplication?
+class CommandSpotlightDelegate: SpotlightDelegate {
+  private let spotlight: Spotlight
 
+  init(_ spotlight: Spotlight) {
+    self.spotlight = spotlight
+  }
+
+  func willShow() {
+    logger.debug("Showing spotlight view")
+  }
+
+  func shown() {
+    logger.debug("Showed spotlight view")
+  }
+
+  func willHide() {
+    logger.debug("Hiding spotlight view")
+  }
+
+  func hidden() {
+    logger.debug("Hid spotlight view")
+  }
+
+  func textChanged(text: String) {
+    logger.debug("Text changed: \(text, privacy: .public)")
+  }
+
+  func tabClicked() {
+    logger.debug("Tab clicked")
+  }
+
+  func keyWithCommandPressed(character: String) -> Bool {
+    logger.debug("Pressed command+\(character, privacy: .public)")
+    if character == "k" {
+      // Clear any entered text, like command + k in Terminal
+      self.spotlight.clear()
+    }
+    return false
+  }
+
+  func keyWithControlPressed(character: String) -> Bool {
+    logger.debug("Pressed control+\(character, privacy: .public)")
+    if character == "c" {
+      // Clear any entered text, like control + c in Terminal
+      self.spotlight.reset()
+    }
+    return false
+  }
+
+  func keyWithCommandAndShiftPressed(character: String) -> Bool {
+    logger.debug("Pressed command+shift+\(character, privacy: .public)")
+    return false
+  }
+
+  func commit() {
+    logger.debug("Committed")
+  }
+
+  func cancel() {
+    logger.debug("Canceled")
+  }
+}
+
+class InputViewController {
   typealias ExecuteCallback = (_ command: String) -> Void
   public var onExecuteCommand: ExecuteCallback = { _ in }
 
-  init?() {
-    guard let mainScreen = NSScreen.main else {
-      logger.error("Unable to find main screen")
-      return nil
-    }
-
-    let width = CGFloat(880)
-    let height = CGFloat(250)
-
-    let centerX = mainScreen.visibleFrame.minX + CGFloat((mainScreen.visibleFrame.width - width) / 2)
-    let centerY = mainScreen.visibleFrame.minY + CGFloat((mainScreen.visibleFrame.height - height) / 2)
-
-    self.window = BorderlessWindow(
-      contentRect: NSRect(
-        x: centerX,
-        y: centerY,
-        width: width,
-        height: height
-      ),
-      // Toggling between these two lines are useful for debugging the UI
-      styleMask: .borderless,
-      // styleMask: .titled,
-      backing: .buffered,
-      defer: false
-    )
-    self.window.canMove = true
-    self.window.level = .floating
-    self.window.tabbingMode = .disallowed
-    self.window.backgroundColor = .clear
-    self.window.isOpaque = false
-
-    let horizontalCenter = Guideline(x: centerX, y: centerY, threshold: CGFloat(10), orientation: .horizontal)
-    let verticalCenter = Guideline(x: centerX, y: centerY, threshold: CGFloat(10), orientation: .vertical)
-    self.window.guidelines.append(horizontalCenter)
-    self.window.guidelines.append(verticalCenter)
-
-    self.commandHistoryManager = CommandHistoryManager()
-    self.completionManager = CompletionManager()
-    self.inputView = InputView(
-      commandHistoryManager: self.commandHistoryManager,
-      completionManager: self.completionManager,
-      onCommit: self.onCommit,
-      onCancel: self.onCancel
-    )
-    self.window.contentView = NSHostingView(rootView: self.inputView)
-
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(self.onWindowLostFocus),
-      name: NSWindow.didResignKeyNotification,
-      object: self.window
-    )
-  }
-
-  @objc func onWindowLostFocus() {
-    self.hide()
-  }
-
-  func onCommit(command: String) {
-    logger.debug("Commiting command '\(command, privacy: .public)'")
-    if !command.isEmpty {
-      self.onExecuteCommand(command)
-      self.commandHistoryManager.append(CommandHistoryItem(command))
-    }
-    self.hide()
-  }
-
-  func onCancel() {
-    self.hide()
-  }
-
   public func show() {
-    DispatchQueue.main.async {
-      self.previousApp = NSWorkspace.shared.runningApplications.first(where: { $0.isActive })
-      self.window.makeKeyAndOrderFront(nil)
-      NSApplication.shared.activate(ignoringOtherApps: true)
-      logger.debug("Window can become key? \(self.window.canBecomeKey), \(self.window.canBecomeMain)")
-      logger.debug("Window is key? \(self.window.isKeyWindow)")
+    // TODO: Only allow one to be shown?
+    // if the hotkey is pressed when it's already shown,
+    // hide it instead?
+    if let spotlight = Spotlight() {
+      let delegate = CommandSpotlightDelegate(spotlight)
+      spotlight.delegate = delegate
+      spotlight.show {
+        command in
+        self.onExecuteCommand(command)
+      }
     }
-  }
-
-  public func hide() {
-    self.completionManager.clear()
-    self.window.orderOut(nil)
-    self.previousApp?.activate(options: .activateAllWindows)
-    self.previousApp = nil
   }
 }
