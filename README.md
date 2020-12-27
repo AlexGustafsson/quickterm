@@ -207,9 +207,9 @@ commandConfiguration:
   sourceBashProfile: true
   # The number of seconds to wait after exit before closing the notification. Not used if keep is true
   delayAfterExit: 3e+0
-hotkeys:
+hotKeys:
   # The global hotkey used for showing the input view (this value currently does nothing)
-  showCommandEntry: option+cmd+t
+  showCommandEntry: option+command+t
 ```
 
 The values should be familiar as they are the same as those configurable via the CLI on a per-command basis.

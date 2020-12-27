@@ -16,7 +16,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   private let connection: NSXPCConnection!
   private let listener: NSXPCListener!
 
-  private let commandEntryHotKey: HotKey!
+  private var hotKeys: [HotKey] = []
 
   private var configObserver: FileObserver!
 
@@ -34,8 +34,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     self.delegate = CommandExecutorDelegate(executor: self.executor)
     self.listener.delegate = self.delegate
-
-    self.commandEntryHotKey = HotKey(key: .t, modifiers: [.command, .option])
   }
 
   func applicationDidFinishLaunching(_: Notification) {
@@ -70,12 +68,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     logger.info("Registering self as an executor")
     service!.registerCommandExecutor(client: self.listener.endpoint)
 
-    logger.info("Registering global hotkey")
-
-    self.commandEntryHotKey.keyDownHandler = {
-      self.inputViewController.show()
-    }
-
     self.inputViewController.onExecuteCommand = {
       command in
       let workingDirectory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
@@ -100,6 +92,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       do {
         try Config.load()
         logger.info("Config file reloaded")
+        self.setupHotKeys()
       } catch {
         logger.error("Unable to reload configuration file: \(error.localizedDescription)")
         ConfigParseAlert(error: error).runModal()
@@ -107,6 +100,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     self.menu = self.createMenu()
+
+    self.setupHotKeys()
+  }
+
+  private func setupHotKeys() {
+    // Remove and unregister all hot keys
+    self.hotKeys.removeAll()
+
+    if let commandEntryHotKey = HotKey(keys: Config.current.hotKeys.showCommandEntry) {
+      logger.info("Registering global hotkey")
+      commandEntryHotKey.keyDownHandler = {
+        self.inputViewController.show()
+      }
+      self.hotKeys.append(commandEntryHotKey)
+    } else {
+      logger.error("Unable to bind hotkey \(Config.current.hotKeys.showCommandEntry, privacy: .public)")
+      HotKeyParseAlert(hotKey: Config.current.hotKeys.showCommandEntry).runModal()
+    }
   }
 
   private func createMenu() -> QuickTermMenu {

@@ -13,9 +13,20 @@ class ConfigParseAlert: NSAlert {
   }
 }
 
+class HotKeyParseAlert: NSAlert {
+  init(hotKey: String) {
+    super.init()
+    self.messageText = "Unable to register hot key"
+    self.informativeText =
+      "Unable to register hot key \(hotKey). Make sure it's correctly specified."
+    self.addButton(withTitle: "OK")
+    self.alertStyle = .warning
+  }
+}
+
 class Config {
   struct HotKeyValues: Codable {
-    var showCommandEntry: String = "option+cmd+t"
+    var showCommandEntry: String = "option+command+t"
   }
 
   struct CommandConfigurationValues: Codable {
@@ -30,7 +41,7 @@ class Config {
 
   struct ConfigValues: Codable {
     var commandConfiguration = CommandConfigurationValues()
-    var hotkeys = HotKeyValues()
+    var hotKeys = HotKeyValues()
   }
 
   private(set) static var main = ConfigValues()
