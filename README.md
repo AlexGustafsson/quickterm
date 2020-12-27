@@ -23,6 +23,10 @@ Note: QuickTerm is currently being actively developed. Until it reaches v1.0.0 b
 <a id="quickstart"></a>
 ## Quick Start
 
+<p align="center">
+  <img src=".github/screenshots/ui.png" alt="UI Screenshot">
+</p>
+
 To install the application, download the latest release from [here](https://github.com/AlexGustafsson/quickterm/releases).
 
 Once installed, you can start the application either via macOS's UI or the command line.
@@ -230,15 +234,19 @@ quick 'cat $(quick --print-config-path)'
 ## Screenshots
 
 <p align="center">
+  <img src=".github/screenshots/cli.png" alt="CLI Screenshot">
+</p>
+
+<p align="center">
+  <img src=".github/screenshots/ui.png" alt="UI Screenshot">
+</p>
+
+<p align="center">
+  <img src=".github/screenshots/fullscreen.png" alt="Fullscreen Screenshot">
+</p>
+
+<p align="center">
   <img src=".github/screenshots/menu.png" alt="Menu Screenshot">
-</p>
-
-<p align="center">
-  <img src=".github/screenshots/input.png" alt="Input Screenshot">
-</p>
-
-<p align="center">
-  <img src=".github/screenshots/output.png" alt="Output Screenshot">
 </p>
 
 <a id="contribute"></a>
