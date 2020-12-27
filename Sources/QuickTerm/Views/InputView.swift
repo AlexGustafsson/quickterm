@@ -24,7 +24,7 @@ struct InputView: View {
   var body: some View {
     VStack(alignment: .center) {
       HStack(alignment: .center) {
-        Text(">").font(.custom("FiraMono-Regular", size: 22)).opacity(0.6)
+        Text("❯").font(.custom("FiraMono-Regular", size: 22)).opacity(0.6)
         SpotlightTextField(
           "Enter command",
           text: $command,
