@@ -35,8 +35,7 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
     self.configuration = configuration
 
     logger.info("Creating session for command \(configuration.command)")
-    var process = Process()
-    process = Process()
+    let process = Process()
     process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
     var command: String = configuration.command
     if configuration.shell == "bash", configuration.sourceBashProfile {

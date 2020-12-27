@@ -4,6 +4,7 @@ import SwiftUI
 
 class InputViewController {
   private let commandHistoryManager: CommandHistoryManager
+  private let completionManager: CompletionManager
   private var inputView: InputView!
   private let window: BorderlessWindow!
   private var previousApp: NSRunningApplication?
@@ -48,8 +49,10 @@ class InputViewController {
     self.window.guidelines.append(verticalCenter)
 
     self.commandHistoryManager = CommandHistoryManager()
+    self.completionManager = CompletionManager()
     self.inputView = InputView(
       commandHistoryManager: self.commandHistoryManager,
+      completionManager: self.completionManager,
       onCommit: self.onCommit,
       onCancel: self.onCancel
     )
@@ -91,8 +94,8 @@ class InputViewController {
   }
 
   public func hide() {
+    self.completionManager.clear()
     self.window.orderOut(nil)
-    self.inputView.command = ""
     self.previousApp?.activate(options: .activateAllWindows)
     self.previousApp = nil
   }

@@ -29,6 +29,9 @@ class ExplicitFontTextField: NSTextField {
   private let controlKey = NSEvent.ModifierFlags.control.rawValue
   private let commandShiftKey = NSEvent.ModifierFlags.command.rawValue | NSEvent.ModifierFlags.shift.rawValue
 
+  typealias AbortCallback = () -> Void
+  public var onAbort: AbortCallback = {}
+
   override class var cellClass: AnyClass? {
     get { ExplicitFontTextFieldCell.self }
     set {}
@@ -76,7 +79,7 @@ class ExplicitFontTextField: NSTextField {
         .controlKey
       {
         // Like ctrl+c in a terminal - abort the command entry
-        self.stringValue = ""
+        self.onAbort()
         return true
       }
     }
@@ -87,8 +90,9 @@ class ExplicitFontTextField: NSTextField {
 struct SpotlightTextField: NSViewRepresentable {
   let placeholder: String
   @Binding var text: String
-  @State var textField: NSTextField? = nil
+  @State var textField: ExplicitFontTextField? = nil
   @ObservedObject var commandHistoryManager: CommandHistoryManager
+  @ObservedObject var completionManager: CompletionManager
 
   @State var historyIndex: Int = -1
 
@@ -104,12 +108,14 @@ struct SpotlightTextField: NSViewRepresentable {
     _ placeholder: String,
     text: Binding<String>,
     commandHistoryManager: CommandHistoryManager,
+    completionManager: CompletionManager,
     onCommit: @escaping CommitCallback,
     onCancel: @escaping CancelCallback
   ) {
     self.placeholder = placeholder
     self._text = text
     self.commandHistoryManager = commandHistoryManager
+    self.completionManager = completionManager
     self.onCommit = onCommit
     self.onCancel = onCancel
   }
@@ -129,6 +135,11 @@ struct SpotlightTextField: NSViewRepresentable {
     textField.allowsEditingTextAttributes = true
     // Disable tabbing to the next view
     textField.nextKeyView = nil
+    textField.onAbort = {
+      logger.debug("Got on abort")
+      self.completionManager.clear()
+      self.text = ""
+    }
     self.textField = textField
     return textField
   }
@@ -151,8 +162,6 @@ struct SpotlightTextField: NSViewRepresentable {
   func makeCoordinator() -> SpotlightTextField.Coordinator {
     Coordinator(parent: self)
   }
-
-  func onTab() {}
 
   func onPreviousInHistory() {
     if self.historyIndex >= self.commandHistoryManager.items.count - 1 {
@@ -183,6 +192,10 @@ struct SpotlightTextField: NSViewRepresentable {
     }
   }
 
+  func onTab() {
+    self.completionManager.complete(self.text)
+  }
+
   class Coordinator: NSObject, NSTextFieldDelegate {
     var parent: SpotlightTextField
 
@@ -197,9 +210,9 @@ struct SpotlightTextField: NSViewRepresentable {
 
     func control(_: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
       if commandSelector == #selector(NSResponder.insertNewline(_:)) {
-        self.parent.onCommit(textView.string)
         self.parent.text = ""
         self.parent.historyIndex = -1
+        self.parent.onCommit(textView.string)
         return true
       } else if commandSelector == #selector(NSResponder.insertTab(_:)) {
         self.parent.onTab()
