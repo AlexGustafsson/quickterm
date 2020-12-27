@@ -32,6 +32,9 @@ class ExplicitFontTextField: NSTextField {
   typealias AbortCallback = () -> Void
   public var onAbort: AbortCallback = {}
 
+  typealias ClearCallback = () -> Void
+  public var onClear: ClearCallback = {}
+
   override class var cellClass: AnyClass? {
     get { ExplicitFontTextFieldCell.self }
     set {}
@@ -66,6 +69,10 @@ class ExplicitFontTextField: NSTextField {
           if NSApp.sendAction(Selector(("undo:")), to: nil, from: self) { return true }
         case "a":
           if NSApp.sendAction(#selector(NSResponder.selectAll(_:)), to: nil, from: self) { return true }
+        case "k":
+          // Like command+k in a terminal - clear the command entry
+          self.onClear()
+          return true
         default:
           break
         }
@@ -78,9 +85,12 @@ class ExplicitFontTextField: NSTextField {
       } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue) == self
         .controlKey
       {
-        // Like ctrl+c in a terminal - abort the command entry
-        self.onAbort()
-        return true
+        // TODO: Does not work
+        if event.charactersIgnoringModifiers == "c" {
+          // Like control+c in a terminal - abort the command entry
+          self.onAbort()
+          return true
+        }
       }
     }
     return super.performKeyEquivalent(with: event)
@@ -138,6 +148,10 @@ struct SpotlightTextField: NSViewRepresentable {
     textField.onAbort = {
       logger.debug("Got on abort")
       self.completionManager.clear()
+      self.text = ""
+    }
+    textField.onClear = {
+      logger.debug("Got on clear")
       self.text = ""
     }
     self.textField = textField
