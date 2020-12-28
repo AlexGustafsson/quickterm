@@ -28,6 +28,13 @@ class CommandSpotlightDelegate: SpotlightDelegate {
 
   func textChanged(text: String) {
     logger.debug("Text changed: \(text, privacy: .public)")
+    if text == "he" {
+      self.spotlight.clearItems()
+      self.spotlight.addDetailItem(text: "echo \"hello, world!\"")
+      self.spotlight.addDetailItem(text: "echo \"hello, world!\"", section: "History")
+    } else {
+      self.spotlight.clearItems()
+    }
   }
 
   func tabClicked() {

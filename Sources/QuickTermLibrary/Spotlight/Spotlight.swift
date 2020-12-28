@@ -4,6 +4,9 @@ import SwiftUI
 
 public class Spotlight: ObservableObject {
   @Published public var text = ""
+  @Published private(set) var sections: [SpotlightItemSection] = []
+
+  private var itemsBySection: [String: [SpotlightItem]] = [:]
 
   /// The window within which the Spotlight view will be rendered
   private(set) var window: SpotlightWindow
@@ -122,5 +125,44 @@ public class Spotlight: ObservableObject {
 
   public func clear() {
     self.text = ""
+  }
+
+  private func updateItems() {
+    var sections: [SpotlightItemSection] = []
+    for sectionHeader in self.itemsBySection.keys {
+      if let items = self.itemsBySection[sectionHeader] {
+        let section = SpotlightItemSection(
+          title: sectionHeader == "" ? nil : sectionHeader,
+          items: items
+        )
+        sections.append(section)
+      }
+    }
+    self.objectWillChange.send()
+    self.sections = sections
+  }
+
+  public func addDetailItem(text: String, details: [String] = [], section: String = "") {
+    let detail = details.count > 0 ? " ― \(details.joined(separator: " • "))" : ""
+    let item = SpotlightItem(text: text, detail: detail)
+    self.addItem(item, section: section)
+  }
+
+  public func addCompletionItem(text: String, completion: String, section: String = "") {
+    let item = SpotlightItem(text: text, detail: completion)
+    self.addItem(item, section: section)
+  }
+
+  public func addItem(_ item: SpotlightItem, section: String = "") {
+    if self.itemsBySection[section] == nil {
+      self.itemsBySection[section] = []
+    }
+    self.itemsBySection[section]?.append(item)
+    self.updateItems()
+  }
+
+  public func clearItems() {
+    self.itemsBySection = [:]
+    self.updateItems()
   }
 }
