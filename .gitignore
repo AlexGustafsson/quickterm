@@ -1,6 +1,7 @@
 .DS_Store
 /distribution
 /build
+/.build
 /Packages
 /*.xcodeproj
 xcuserdata/
