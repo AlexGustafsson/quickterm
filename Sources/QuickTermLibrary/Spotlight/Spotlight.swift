@@ -7,7 +7,7 @@ public class Spotlight: ObservableObject {
   @Published private(set) var itemCount: Int = 0
   @Published private(set) var items: [SpotlightItem] = []
   @Published private(set) var sections: [SpotlightItemSection] = []
-  @Published private(set) var selectedItem: Int = 0
+  @Published private(set) var selectedItem: Int? = nil
 
   private var itemsBySection: [String: [SpotlightItem]] = [:]
 
@@ -139,10 +139,12 @@ public class Spotlight: ObservableObject {
         itemCount += items.count
         sections.append(section)
         for item in items {
-          if index == self.selectedItem {
-            item.selected = true
-          } else {
-            item.selected = false
+          if let selectedItem = self.selectedItem {
+            if index == selectedItem {
+              item.selected = true
+            } else {
+              item.selected = false
+            }
           }
           index += 1
         }
@@ -178,12 +180,24 @@ public class Spotlight: ObservableObject {
   }
 
   public func nextItem() {
-    self.selectedItem = (self.selectedItem + 1) % self.itemCount
+    if let selectedItem = self.selectedItem {
+      self.selectedItem = (selectedItem + 1) % self.itemCount
+    } else {
+      self.selectedItem = 0
+    }
     self.updateItems()
   }
 
   public func previousItem() {
-    self.selectedItem = self.selectedItem == 0 ? self.itemCount - 1 : self.selectedItem - 1
+    if let selectedItem = self.selectedItem {
+      self.selectedItem = selectedItem == 0 ? self.itemCount - 1 : selectedItem - 1
+    } else {
+      self.selectedItem = 0
+    }
     self.updateItems()
+  }
+
+  public func clearSelection() {
+    self.selectedItem = nil
   }
 }

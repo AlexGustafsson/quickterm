@@ -36,6 +36,7 @@ class CommandSpotlightDelegate: SpotlightDelegate {
       self.spotlight.addDetailItem(text: "echo \"hello, world!\"", section: "History")
     } else {
       self.spotlight.clearItems()
+      self.spotlight.clearSelection()
     }
   }
 
