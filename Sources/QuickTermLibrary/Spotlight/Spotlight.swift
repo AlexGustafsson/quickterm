@@ -4,7 +4,10 @@ import SwiftUI
 
 public class Spotlight: ObservableObject {
   @Published public var text = ""
+  @Published private(set) var itemCount: Int = 0
+  @Published private(set) var items: [SpotlightItem] = []
   @Published private(set) var sections: [SpotlightItemSection] = []
+  @Published private(set) var selectedItem: Int = 0
 
   private var itemsBySection: [String: [SpotlightItem]] = [:]
 
@@ -115,10 +118,6 @@ public class Spotlight: ObservableObject {
     self.delegate?.cancel()
   }
 
-  public func previousItem() {}
-
-  public func nextItem() {}
-
   public func reset() {
     self.text = ""
   }
@@ -128,17 +127,29 @@ public class Spotlight: ObservableObject {
   }
 
   private func updateItems() {
+    var itemCount = 0
     var sections: [SpotlightItemSection] = []
+    var index = 0
     for sectionHeader in self.itemsBySection.keys {
       if let items = self.itemsBySection[sectionHeader] {
         let section = SpotlightItemSection(
           title: sectionHeader == "" ? nil : sectionHeader,
           items: items
         )
+        itemCount += items.count
         sections.append(section)
+        for item in items {
+          if index == self.selectedItem {
+            item.selected = true
+          } else {
+            item.selected = false
+          }
+          index += 1
+        }
       }
     }
     self.objectWillChange.send()
+    self.itemCount = itemCount
     self.sections = sections
   }
 
@@ -163,6 +174,16 @@ public class Spotlight: ObservableObject {
 
   public func clearItems() {
     self.itemsBySection = [:]
+    self.updateItems()
+  }
+
+  public func nextItem() {
+    self.selectedItem = (self.selectedItem + 1) % self.itemCount
+    self.updateItems()
+  }
+
+  public func previousItem() {
+    self.selectedItem = self.selectedItem == 0 ? self.itemCount - 1 : self.selectedItem - 1
     self.updateItems()
   }
 }
