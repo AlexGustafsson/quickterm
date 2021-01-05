@@ -108,6 +108,9 @@ public class Spotlight: ObservableObject {
 
   public func commit() {
     self.hide()
+    if let selectedItem = self.selectedItem {
+      self.text = self.items[selectedItem].completion
+    }
     self.onCommit(self.text)
     self.delegate?.commit()
   }
@@ -155,14 +158,14 @@ public class Spotlight: ObservableObject {
     self.sections = sections
   }
 
-  public func addDetailItem(text: String, details: [String] = [], section: String = "") {
+  public func addDetailItem(text: String, details: [String] = [], completion: String, section: String = "") {
     let detail = details.count > 0 ? " ― \(details.joined(separator: " • "))" : ""
-    let item = SpotlightItem(text: text, detail: detail)
+    let item = SpotlightItem(text: text, detail: detail, completion: completion)
     self.addItem(item, section: section)
   }
 
   public func addCompletionItem(text: String, completion: String, section: String = "") {
-    let item = SpotlightItem(text: text, detail: completion)
+    let item = SpotlightItem(text: text, detail: completion, completion: text + completion)
     self.addItem(item, section: section)
   }
 
@@ -171,11 +174,13 @@ public class Spotlight: ObservableObject {
       self.itemsBySection[section] = []
     }
     self.itemsBySection[section]?.append(item)
+    self.items.append(item)
     self.updateItems()
   }
 
   public func clearItems() {
     self.itemsBySection = [:]
+    self.items = []
     self.updateItems()
   }
 
@@ -199,5 +204,14 @@ public class Spotlight: ObservableObject {
 
   public func clearSelection() {
     self.selectedItem = nil
+  }
+
+  public func tabPressed() {
+    if let selectedItem = self.selectedItem {
+      self.text = self.items[selectedItem].completion
+      self.delegate?.textChanged(text: self.text)
+    } else {
+      // TODO: Handle tab completion etc.
+    }
   }
 }

@@ -168,7 +168,7 @@ struct SpotlightTextField: NSViewRepresentable {
         return true
       } else if commandSelector == #selector(NSResponder.insertTab(_:)) {
         // Tab was clicked - let the delegate deside what to do
-        self.parent.controller.delegate?.tabClicked()
+        self.parent.controller.tabPressed()
         return true
       } else if commandSelector == #selector(NSResponder.cancelOperation(_:)) {
         // Escape was clicked - cancel the view

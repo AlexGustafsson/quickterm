@@ -30,10 +30,14 @@ class CommandSpotlightDelegate: SpotlightDelegate {
     logger.debug("Text changed: \(text, privacy: .public)")
     if text == "he" {
       self.spotlight.clearItems()
-      self.spotlight.addDetailItem(text: "echo \"hello, world!\"")
-      self.spotlight.addDetailItem(text: "echo \"hello, world!\"", section: "History")
-      self.spotlight.addDetailItem(text: "echo \"hello, world!\"", section: "History")
-      self.spotlight.addDetailItem(text: "echo \"hello, world!\"", section: "History")
+      self.spotlight.addCompletionItem(text: "he", completion: "llo world")
+      self.spotlight.addCompletionItem(text: "He", completion: "llo, World!")
+      self.spotlight.addDetailItem(
+        text: "echo \"hello, world!\"",
+        completion: "echo \"hello, world!\"",
+        section: "History"
+      )
+      self.spotlight.addDetailItem(text: "hello world", completion: "echo \"hello, world!\"", section: "History")
     } else {
       self.spotlight.clearItems()
       self.spotlight.clearSelection()

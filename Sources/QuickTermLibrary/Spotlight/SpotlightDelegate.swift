@@ -12,9 +12,6 @@ public protocol SpotlightDelegate {
   /// The text changed. Optional.
   func textChanged(text: String)
 
-  /// The tab key was clicked. Optional.
-  func tabClicked()
-
   /// A key was pressed with the command key being down. Return whether or not the key was handled. Optional.
   func keyWithCommandPressed(character: String) -> Bool
   /// A key was pressed with the control key being down. Return whether or not the key was handled. Optional.
@@ -36,8 +33,6 @@ extension SpotlightDelegate {
   func hidden() {}
 
   func textChanged(text _: String) {}
-
-  func tabClicked() {}
 
   func keyWithCommandPressed(character _: String) -> Bool { false }
   func keyWithControlPressed(character _: String) -> Bool { false }
