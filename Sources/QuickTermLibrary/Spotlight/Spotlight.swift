@@ -31,7 +31,7 @@ public class Spotlight: ObservableObject {
     }
 
     let width = CGFloat(880)
-    let height = CGFloat(250)
+    let height = CGFloat(638)
 
     let centerX = mainScreen.visibleFrame.minX + CGFloat((mainScreen.visibleFrame.width - width) / 2)
     let centerY = mainScreen.visibleFrame.minY + CGFloat((mainScreen.visibleFrame.height - height) / 2)
