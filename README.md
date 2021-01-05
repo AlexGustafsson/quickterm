@@ -157,7 +157,7 @@ To get started with the CLI, run `quick --help` to see the available functions.
 ```
 OVERVIEW: Run a command in a separate window
 
-USAGE: quick [--animate] [--shell <shell>] [--timeout <timeout>] [--keep] [--wait-for-exit] [--no-bash-profile] [--delay-after-exit <delay-after-exit>] [--dump] [--print-config-path] [--verbose] [<command> ...]
+USAGE: quick [--animate] [--shell <shell>] [--timeout <timeout>] [--keep] [--wait-for-exit] [--no-bash-profile] [--delay-after-exit <delay-after-exit>] [--working-directory <working-directory>] [--dump] [--print-config-path] [<command> ...]
 
 ARGUMENTS:
   <command>               Command to execute. If none is given, starts the daemon instead
@@ -171,6 +171,8 @@ OPTIONS:
   --no-bash-profile       Don't source `~/.bash_profile` before executing the command. Applicable only when using Bash as shell
   --delay-after-exit <delay-after-exit>
                           The number of seconds to wait after exit before closing the notification. Not used if keep is true (default: 3.0)
+  --working-directory <working-directory>
+                          The working directory to run the command in. Defaults to the current working directory (default: /Users/alexgustafsson/Documents/GitHub/quickterm)
   --dump                  Dump the command configuration as JSON. Will be used if the command is to be ran
   --print-config-path     Print the path to the config file
   -h, --help              Show help information.
@@ -213,6 +215,8 @@ commandConfiguration:
   sourceBashProfile: true
   # The number of seconds to wait after exit before closing the notification. Not used if keep is true
   delayAfterExit: 3e+0
+  # The working directory to use for commands entered via the UI (may be disregarded, will default to CWD when started)
+  workingDirectory: /Users/alexgustafsson
 hotKeys:
   # The global hotkey used for showing the input view (this value currently does nothing)
   showCommandEntry: option+command+t

@@ -37,6 +37,7 @@ class Config {
     var waitForExit: Bool = false
     var sourceBashProfile: Bool = true
     var delayAfterExit: Double = 3
+    var workingDirectory: String? = nil
   }
 
   struct ConfigValues: Codable {

@@ -70,9 +70,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     self.inputViewController.onExecuteCommand = {
       command in
-      let workingDirectory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+      let workingDirectory = Config.current.commandConfiguration.workingDirectory ?? FileManager.default
+        .currentDirectoryPath
       let configuration = QuickTermShared.CommandConfiguration(
-        workingDirectory: workingDirectory,
+        workingDirectory: URL(fileURLWithPath: workingDirectory),
         command: command,
         shell: Config.current.commandConfiguration.shell,
         timeout: Config.current.commandConfiguration.timeout,

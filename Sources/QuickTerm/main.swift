@@ -106,6 +106,9 @@ struct Quick: ParsableCommand {
   @Option(help: "The number of seconds to wait after exit before closing the notification. Not used if keep is true")
   var delayAfterExit: Double = Config.current.commandConfiguration.delayAfterExit
 
+  @Option(help: "The working directory to run the command in. Defaults to the current working directory")
+  var workingDirectory: String = FileManager.default.currentDirectoryPath
+
   @Flag(help: "Dump the command configuration as JSON. Will be used if the command is to be ran")
   var dump: Bool = false
 
@@ -154,9 +157,8 @@ struct Quick: ParsableCommand {
         print("Daemon is already running", to: &stderr)
         throw ExitCode(1)
       } else {
-        let workingDirectory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
         let commandConfiguration = QuickTermShared.CommandConfiguration(
-          workingDirectory: workingDirectory,
+          workingDirectory: URL(fileURLWithPath: self.workingDirectory),
           command: command,
           shell: self.shell,
           timeout: self.timeout,
