@@ -5,7 +5,6 @@ import SwiftUI
 public class Spotlight: ObservableObject {
   @Published public var text = ""
   @Published private(set) var itemCount: Int = 0
-  @Published private(set) var items: [SpotlightItem] = []
   @Published private(set) var sections: [SpotlightItemSection] = []
   @Published private(set) var selectedItem: Int? = nil
 
@@ -180,13 +179,30 @@ public class Spotlight: ObservableObject {
       self.itemsBySection[section] = []
     }
     self.itemsBySection[section]?.append(item)
-    self.items.append(item)
     self.updateItems()
+  }
+
+  public func getItem(byIndex index: Int) -> SpotlightItem? {
+    var offset = 0
+    for sectionHeader in self.itemsBySection.keys {
+      if let items = self.itemsBySection[sectionHeader] {
+        if index < offset + items.count {
+          return items[index - offset]
+        }
+        offset += items.count
+      }
+    }
+
+    return nil
   }
 
   public func clearItems() {
     self.itemsBySection = [:]
-    self.items = []
+    self.updateItems()
+  }
+
+  public func clearSection(_ section: String) {
+    self.itemsBySection.removeValue(forKey: section)
     self.updateItems()
   }
 
@@ -214,7 +230,7 @@ public class Spotlight: ObservableObject {
 
   public func completeText() {
     if let selectedItem = self.selectedItem {
-      let item = self.items[selectedItem]
+      let item = self.getItem(byIndex: selectedItem)!
       if let textToComplete = item.textToComplete {
         self.text += textToComplete
       } else if let textToInsert = item.textToInsert {

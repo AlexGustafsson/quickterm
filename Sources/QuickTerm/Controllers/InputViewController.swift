@@ -30,7 +30,8 @@ class CommandSpotlightDelegate: SpotlightDelegate {
   func textChanged(text: String) {
     logger.debug("Text changed: \(text, privacy: .public)")
     if text == "he" {
-      self.spotlight.clearItems()
+      self.spotlight.clearSection("")
+      self.spotlight.clearSection("History")
       self.spotlight.addCompletionItem(text: "he", textToComplete: "llo world")
       self.spotlight.addCompletionItem(text: "He", textToComplete: "llo, World!")
       self.spotlight.addDetailItem(
@@ -40,16 +41,19 @@ class CommandSpotlightDelegate: SpotlightDelegate {
       )
       self.spotlight.addDetailItem(text: "hello world", textToInsert: "echo \"hello, world!\"", section: "History")
     } else {
+      self.spotlight.clearSection("")
+      self.spotlight.clearSection("History")
+    }
+
+    if text == "" {
       self.spotlight.clearItems()
-      self.spotlight.clearSelection()
     }
   }
 
   func tabPressed() {
     logger.debug("Tab pressed")
 
-    self.spotlight.clearItems()
-    self.spotlight.clearSelection()
+    self.spotlight.clearSection("Files")
 
     let workingDirectory = Config.current.commandConfiguration.workingDirectory ?? FileManager.default
       .currentDirectoryPath
