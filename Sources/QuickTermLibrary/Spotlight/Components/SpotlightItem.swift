@@ -5,14 +5,16 @@ public class SpotlightItem: Identifiable, ObservableObject {
   @Published var text: String
   @Published var detail: String
   @Published var selected: Bool = false
-  @Published var completion: String
+  @Published var textToComplete: String? = nil
+  @Published var textToInsert: String? = nil
 
   public let id = UUID()
 
-  public init(text: String, detail: String, completion: String) {
+  public init(text: String, detail: String, textToComplete: String? = nil, textToInsert: String? = nil) {
     self.text = text
     self.detail = detail
-    self.completion = completion
+    self.textToComplete = textToComplete
+    self.textToInsert = textToInsert
   }
 
   static func == (lhs: SpotlightItem, rhs: SpotlightItem) -> Bool {

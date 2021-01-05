@@ -23,6 +23,9 @@ public protocol SpotlightDelegate {
   func commit()
   /// The user canceled the request. Optional.
   func cancel()
+
+  /// The user pressed tab (likely wants completion etc.). Optional.
+  func tabPressed()
 }
 
 extension SpotlightDelegate {
@@ -40,4 +43,6 @@ extension SpotlightDelegate {
 
   func commit() {}
   func cancel() {}
+
+  func tabPressed() {}
 }

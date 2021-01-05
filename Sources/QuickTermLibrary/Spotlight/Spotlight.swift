@@ -109,7 +109,7 @@ public class Spotlight: ObservableObject {
   public func commit() {
     self.hide()
     if let selectedItem = self.selectedItem {
-      self.text = self.items[selectedItem].completion
+      self.completeText()
     }
     self.onCommit(self.text)
     self.delegate?.commit()
@@ -158,14 +158,20 @@ public class Spotlight: ObservableObject {
     self.sections = sections
   }
 
-  public func addDetailItem(text: String, details: [String] = [], completion: String, section: String = "") {
+  public func addDetailItem(text: String, details: [String] = [], textToComplete: String, section: String = "") {
     let detail = details.count > 0 ? " ― \(details.joined(separator: " • "))" : ""
-    let item = SpotlightItem(text: text, detail: detail, completion: completion)
+    let item = SpotlightItem(text: text, detail: detail, textToComplete: textToComplete)
     self.addItem(item, section: section)
   }
 
-  public func addCompletionItem(text: String, completion: String, section: String = "") {
-    let item = SpotlightItem(text: text, detail: completion, completion: text + completion)
+  public func addDetailItem(text: String, details: [String] = [], textToInsert: String, section: String = "") {
+    let detail = details.count > 0 ? " ― \(details.joined(separator: " • "))" : ""
+    let item = SpotlightItem(text: text, detail: detail, textToInsert: textToInsert)
+    self.addItem(item, section: section)
+  }
+
+  public func addCompletionItem(text: String, textToComplete: String, section: String = "") {
+    let item = SpotlightItem(text: text, detail: textToComplete, textToComplete: textToComplete)
     self.addItem(item, section: section)
   }
 
@@ -206,12 +212,23 @@ public class Spotlight: ObservableObject {
     self.selectedItem = nil
   }
 
+  public func completeText() {
+    if let selectedItem = self.selectedItem {
+      let item = self.items[selectedItem]
+      if let textToComplete = item.textToComplete {
+        self.text += textToComplete
+      } else if let textToInsert = item.textToInsert {
+        self.text = textToInsert
+      }
+      self.delegate?.textChanged(text: self.text)
+    }
+  }
+
   public func tabPressed() {
     if let selectedItem = self.selectedItem {
-      self.text = self.items[selectedItem].completion
-      self.delegate?.textChanged(text: self.text)
+      self.completeText()
     } else {
-      // TODO: Handle tab completion etc.
+      self.delegate?.tabPressed()
     }
   }
 }

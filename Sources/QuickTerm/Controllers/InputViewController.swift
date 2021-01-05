@@ -2,6 +2,7 @@ import AppKit
 import QuickTermLibrary
 import QuickTermShared
 import SwiftUI
+import UniformTypeIdentifiers
 
 class CommandSpotlightDelegate: SpotlightDelegate {
   private let spotlight: Spotlight
@@ -30,22 +31,76 @@ class CommandSpotlightDelegate: SpotlightDelegate {
     logger.debug("Text changed: \(text, privacy: .public)")
     if text == "he" {
       self.spotlight.clearItems()
-      self.spotlight.addCompletionItem(text: "he", completion: "llo world")
-      self.spotlight.addCompletionItem(text: "He", completion: "llo, World!")
+      self.spotlight.addCompletionItem(text: "he", textToComplete: "llo world")
+      self.spotlight.addCompletionItem(text: "He", textToComplete: "llo, World!")
       self.spotlight.addDetailItem(
         text: "echo \"hello, world!\"",
-        completion: "echo \"hello, world!\"",
+        textToInsert: "echo \"hello, world!\"",
         section: "History"
       )
-      self.spotlight.addDetailItem(text: "hello world", completion: "echo \"hello, world!\"", section: "History")
+      self.spotlight.addDetailItem(text: "hello world", textToInsert: "echo \"hello, world!\"", section: "History")
     } else {
       self.spotlight.clearItems()
       self.spotlight.clearSelection()
     }
   }
 
-  func tabClicked() {
-    logger.debug("Tab clicked")
+  func tabPressed() {
+    logger.debug("Tab pressed")
+
+    self.spotlight.clearItems()
+    self.spotlight.clearSelection()
+
+    let workingDirectory = Config.current.commandConfiguration.workingDirectory ?? FileManager.default
+      .currentDirectoryPath
+    do {
+      let basenames = try FileManager.default.contentsOfDirectory(atPath: workingDirectory)
+      for basename in basenames {
+        var path = URL(fileURLWithPath: workingDirectory)
+        path.appendPathComponent(basename)
+        var details: [String] = []
+
+        let attributes = try path
+          .resourceValues(
+            forKeys: Set([
+              .fileSizeKey,
+              .contentModificationDateKey,
+              .isRegularFileKey,
+              .isSymbolicLinkKey,
+              .isExecutableKey,
+              .isDirectoryKey,
+            ])
+          )
+        if attributes.isRegularFile ?? false {
+          details.append("File")
+          if attributes.isExecutable ?? false {
+            details.append("Executable")
+          }
+
+          if let fileSize = attributes.fileSize {
+            let formattedFileSize = ByteCountFormatter.string(fromByteCount: Int64(fileSize), countStyle: .file)
+            details.append(formattedFileSize)
+          }
+        } else if attributes.isSymbolicLink ?? false {
+          details.append("Link")
+        } else if attributes.isDirectory ?? false {
+          details.append("Directory")
+        }
+
+        if let modificationDate = attributes.contentModificationDate {
+          let dateFormatter = DateFormatter()
+          dateFormatter.dateStyle = .medium
+          dateFormatter.timeStyle = .none
+          dateFormatter.locale = Locale.current
+
+          details.append(dateFormatter.string(from: modificationDate))
+        }
+
+        self.spotlight.addDetailItem(text: basename, details: details, textToComplete: basename, section: "Files")
+      }
+    } catch {
+      logger.error("Unable to complete file paths: \(error.localizedDescription, privacy: .public)")
+    }
   }
 
   func keyWithCommandPressed(character: String) -> Bool {
