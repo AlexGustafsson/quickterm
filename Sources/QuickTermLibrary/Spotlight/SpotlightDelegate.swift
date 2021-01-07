@@ -19,8 +19,13 @@ public protocol SpotlightDelegate {
   /// A key was pressed with the command and shift key being down. Return whether or not the key was handled. Optional.
   func keyWithCommandAndShiftPressed(character: String) -> Bool
 
+  /// The up key was pressed. Optional.
+  func upPressed()
+  /// The down key was pressed. Optional.
+  func downPressed()
+
   /// The user submitted the request. Optional.
-  func commit()
+  func commit(text: String)
   /// The user canceled the request. Optional.
   func cancel()
 
@@ -41,7 +46,12 @@ extension SpotlightDelegate {
   func keyWithControlPressed(character _: String) -> Bool { false }
   func keyWithCommandAndShiftPressed(character _: String) -> Bool { false }
 
-  func commit() {}
+  /// The up key was pressed. Optional.
+  func upPressed() {}
+  /// The down key was pressed. Optional.
+  func downPressed() {}
+
+  func commit(text _: String) {}
   func cancel() {}
 
   func tabPressed() {}

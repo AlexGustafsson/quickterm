@@ -111,7 +111,7 @@ public class Spotlight: ObservableObject {
       self.completeText()
     }
     self.onCommit(self.text)
-    self.delegate?.commit()
+    self.delegate?.commit(text: self.text)
   }
 
   public func cancel() {
@@ -206,7 +206,12 @@ public class Spotlight: ObservableObject {
     self.updateItems()
   }
 
+  public func hasSection(_ section: String) -> Bool {
+    self.itemsBySection[section] != nil
+  }
+
   public func nextItem() {
+    self.delegate?.downPressed()
     if let selectedItem = self.selectedItem {
       self.selectedItem = (selectedItem + 1) % self.itemCount
     } else {
@@ -216,6 +221,7 @@ public class Spotlight: ObservableObject {
   }
 
   public func previousItem() {
+    self.delegate?.upPressed()
     if let selectedItem = self.selectedItem {
       self.selectedItem = selectedItem == 0 ? self.itemCount - 1 : selectedItem - 1
     } else {
