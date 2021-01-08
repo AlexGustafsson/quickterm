@@ -99,10 +99,9 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
   }
 
   public func terminate() {
-    if self.isRunning {
-      logger.info("Terminating session \(self.id, privacy: .public)")
-      self.process.terminate()
-    }
+    logger.info("Terminating session \(self.id, privacy: .public)")
+    // Does nothing if it's already terminated
+    self.process.terminate()
   }
 
   @objc private func onStdoutDataAvailable() {
@@ -135,7 +134,7 @@ class TerminalSession: Identifiable, ObservableObject, Equatable {
     }
   }
 
-  @objc private func onTermination() {
+  private func onTermination() {
     logger.info("Process exited with code \(self.process.terminationStatus, privacy: .public)")
     self.exitCode = self.process.terminationStatus
     self.wasSuccessful = self.exitCode == 0

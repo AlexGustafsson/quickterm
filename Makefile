@@ -121,7 +121,7 @@ sign: build/QuickTerm.app
 
 # Tail logs produced by QuickTerm
 logs:
-	log stream --info --debug --predicate 'subsystem BEGINSWITH "se.axgn.QuickTerm"'
+	log stream --info --debug --predicate 'subsystem BEGINSWITH "se.axgn.QuickTerm" || (eventMessage CONTAINS "QuickTerm" && messageType IN {16, 17})'
 
 # Remove all dynamically created files
 clean:
