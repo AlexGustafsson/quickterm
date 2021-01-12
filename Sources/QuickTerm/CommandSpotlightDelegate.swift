@@ -4,11 +4,6 @@ import QuickTermShared
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct HistoryItem {
-  let command: String
-  let executionTime: Date
-}
-
 class CommandSpotlightDelegate: SpotlightDelegate {
   private let spotlight: Spotlight
   private let history: [HistoryItem]
@@ -167,28 +162,6 @@ class CommandSpotlightDelegate: SpotlightDelegate {
     logger.debug("Pressed down")
     if !self.spotlight.hasSection("History") {
       self.renderHistory()
-    }
-  }
-}
-
-class InputViewController {
-  typealias ExecuteCallback = (_ command: String) -> Void
-  public var onExecuteCommand: ExecuteCallback = { _ in }
-
-  private var history: [HistoryItem] = []
-
-  public func show() {
-    // TODO: Only allow one to be shown?
-    // if the hotkey is pressed when it's already shown,
-    // hide it instead?
-    if let spotlight = Spotlight() {
-      let delegate = CommandSpotlightDelegate(spotlight, history: self.history)
-      spotlight.delegate = delegate
-      spotlight.show {
-        text in
-        self.onExecuteCommand(text)
-        self.history.append(HistoryItem(command: text, executionTime: Date()))
-      }
     }
   }
 }

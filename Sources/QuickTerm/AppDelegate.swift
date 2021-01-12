@@ -1,13 +1,18 @@
 import AppKit
 import HotKey
+import QuickTermLibrary
 import QuickTermShared
 import SwiftUI
+
+struct HistoryItem {
+  let command: String
+  let executionTime: Date
+}
 
 class AppDelegate: NSObject, NSApplicationDelegate {
   private var menu: QuickTermMenu?
 
   private let notificationViewController: NotificationViewController!
-  private let inputViewController: InputViewController!
 
   private let sessionManager: TerminalSessionManager!
 
@@ -20,10 +25,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   private var configObserver: FileObserver!
 
+  private var history: [HistoryItem] = []
+
+  private var spotlightIsShowing: Bool = false
+
   override init() {
     self.sessionManager = TerminalSessionManager()
     self.notificationViewController = NotificationViewController(sessionManager: self.sessionManager)
-    self.inputViewController = InputViewController()
 
     self.connection = NSXPCConnection(serviceName: "se.axgn.QuickTerm.Broker")
     self.connection.remoteObjectInterface = NSXPCInterface(with: BrokerProtocol.self)
@@ -68,26 +76,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     logger.info("Registering self as an executor")
     service!.registerCommandExecutor(client: self.listener.endpoint)
 
-    self.inputViewController.onExecuteCommand = {
-      command in
-      let workingDirectory = Config.current.commandConfiguration.workingDirectory ?? FileManager.default
-        .currentDirectoryPath
-      let configuration = QuickTermShared.CommandConfiguration(
-        workingDirectory: URL(fileURLWithPath: workingDirectory),
-        command: command,
-        shell: Config.current.commandConfiguration.shell,
-        timeout: Config.current.commandConfiguration.timeout,
-        keep: Config.current.commandConfiguration.keep,
-        startTime: Date(),
-        animate: Config.current.commandConfiguration.animate,
-        waitForExit: Config.current.commandConfiguration.waitForExit,
-        sourceBashProfile: Config.current.commandConfiguration.sourceBashProfile,
-        delayAfterExit: Config.current.commandConfiguration.delayAfterExit
-      )
-      let session = TerminalSession(configuration)
-      self.sessionManager.schedule(session)
-    }
-
     self.configObserver = FileObserver(Config.filePath) {
       logger.info("Config file changed")
       do {
@@ -112,7 +100,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     if let commandEntryHotKey = HotKey(keys: Config.current.hotKeys.showCommandEntry) {
       logger.info("Registering global hotkey")
       commandEntryHotKey.keyDownHandler = {
-        self.inputViewController.show()
+        self.promptUserForCommand()
       }
       self.hotKeys.append(commandEntryHotKey)
     } else {
@@ -131,12 +119,51 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       viewController.show()
     }
     menu.onShowCommandEntry = {
-      self.inputViewController.show()
+      self.promptUserForCommand()
     }
     menu.onOpenConfigurationFile = {
       NSWorkspace.shared.open(Config.filePath)
     }
     return menu
+  }
+
+  func promptUserForCommand() {
+    if self.spotlightIsShowing {
+      logger.debug("User requested command prompt, but it's already shown")
+      return
+    }
+
+    if let spotlight = Spotlight() {
+      self.spotlightIsShowing = true
+      let delegate = CommandSpotlightDelegate(spotlight, history: self.history)
+      spotlight.delegate = delegate
+      spotlight.show {
+        command in
+
+        let workingDirectory = Config.current.commandConfiguration.workingDirectory ?? FileManager.default
+          .currentDirectoryPath
+        let configuration = QuickTermShared.CommandConfiguration(
+          workingDirectory: URL(fileURLWithPath: workingDirectory),
+          command: command,
+          shell: Config.current.commandConfiguration.shell,
+          timeout: Config.current.commandConfiguration.timeout,
+          keep: Config.current.commandConfiguration.keep,
+          startTime: Date(),
+          animate: Config.current.commandConfiguration.animate,
+          waitForExit: Config.current.commandConfiguration.waitForExit,
+          sourceBashProfile: Config.current.commandConfiguration.sourceBashProfile,
+          delayAfterExit: Config.current.commandConfiguration.delayAfterExit
+        )
+
+        let session = TerminalSession(configuration)
+        self.sessionManager.schedule(session)
+
+        self.history.append(HistoryItem(command: command, executionTime: Date()))
+      }
+      self.spotlightIsShowing = false
+    } else {
+      logger.error("Unable to open prompt user for command")
+    }
   }
 
   func applicationWillTerminate(_: Notification) {
