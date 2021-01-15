@@ -78,44 +78,46 @@ A global hotkey is also available to easily run commands from anywhere. Simply p
 <a id="installation"></a>
 ## Installation
 
-### Using homebrew
+### Using Homebrew
 
-Upcoming.
+```sh
+brew install --cask alexgustafsson/tap/quickterm
+```
 
-### Using pre-built package
+### Downloading a pre-built release
 
-Download the latest release from [here](https://github.com/AlexGustafsson/quickterm/releases).
+Download the latest release from [here](https://github.com/AlexGustafsson/quickterm/releases) and place `QuickTerm.app` in `/Applications`.
 
 ### Build from source
 
 Clone the repository.
 
-```
+```sh
 git clone https://github.com/AlexGustafsson/quickterm.git && cd quickterm
 ```
 
 Optionally check out a specific version.
 
-```
+```sh
 git checkout v0.3.0
 ```
 
 Build the application.
 
-```
+```sh
 make build
 ```
 
 Optionally sign the application.
 
-```
+```sh
 export CODESIGN_IDENTITY="Apple Development: account@example.com (ABCD123EFG)"
 make sign
 ```
 
 Copy the built application to the applications folder.
 
-```
+```sh
 cp -r ./build/QuickTerm.app /Applications
 ```
 
@@ -123,13 +125,13 @@ cp -r ./build/QuickTerm.app /Applications
 
 The CLI is available in the same binary as the UI and can be run like so:
 
-```
+```sh
 /Applications/QuickTerm.app/Contents/MacOS/QuickTerm --help
 ```
 
 Though the intended usage is via an alias which you can install like so:
 
-```
+```sh
 echo 'alias quick="/Applications/QuickTerm.app/Contents/MacOS/QuickTerm"' >> ~/.bash_profile
 ```
 
@@ -184,7 +186,7 @@ As shown in the overview above, there are also options to configure whether or n
 
 For debugging purposes, one may also chose to dump the parsed command configuration by executing a command such as the following.
 
-```
+```sh
 quick --timeout 5 --animate --shell zsh --dump echo "Hello, World!"
 ```
 
@@ -230,7 +232,7 @@ To open the config, either use the UI via Open Configuration File, or use the CL
 
 To easily show your current configuration, you can use quick:
 
-```
+```sh
 quick 'cat $(quick --print-config-path)'
 ```
 
@@ -264,7 +266,7 @@ If you're new to the open source community, Swift, GitHub or just uncertain wher
 
 ### Development
 
-```
+```sh
 # Clone project
 git clone https://github.com/AlexGustafsson/quickterm.git && cd quickterm
 
