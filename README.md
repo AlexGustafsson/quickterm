@@ -8,7 +8,7 @@
   <a href="https://github.com/AlexGustafsson/quickterm/releases">
     <img src="https://flat.badgen.net/github/release/AlexGustafsson/quickterm" alt="Latest Release" />
   </a>
-  <a href="https://github.com/AlexGustafsson/quickterm/blob/master/Package.swift">
+  <a href="https://github.com/AlexGustafsson/quickterm/blob/main/Package.swift">
     <img src="https://flat.badgen.net/badge/platform/macOS%20%2011/gray" alt="Platform macOS 11" />
   </a>
   <br>
