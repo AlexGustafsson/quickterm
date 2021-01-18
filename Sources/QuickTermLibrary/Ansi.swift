@@ -1,7 +1,7 @@
 import os
 import SwiftUI
 
-let logger = Logger(subsystem: "se.axgn.QuickTermLibrary", category: "library")
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "Library/ANSI")
 
 public enum AnsiParseTreeNode {
   case string(String)

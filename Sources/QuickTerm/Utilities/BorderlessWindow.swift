@@ -1,4 +1,7 @@
 import AppKit
+import os
+
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "UI/Utilities/BorderlessWindow")
 
 struct Guideline {
   public let x: CGFloat

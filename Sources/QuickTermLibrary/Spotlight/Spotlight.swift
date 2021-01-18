@@ -1,6 +1,9 @@
 import AppKit
+import os
 import QuickTermShared
 import SwiftUI
+
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "Library/Spotlight/Spotlight")
 
 public class Spotlight: ObservableObject {
   @Published public var text = ""

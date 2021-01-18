@@ -1,6 +1,12 @@
 import AppKit
+import os
 import QuickTermShared
 import SwiftUI
+
+private let logger = Logger(
+  subsystem: Bundle.main.bundleIdentifier!,
+  category: "UI/Controllers/NotificationViewController"
+)
 
 class NotificationHostingView: NSHostingView<ContentView> {
   typealias FocusChangedCallback = (Bool) -> Void

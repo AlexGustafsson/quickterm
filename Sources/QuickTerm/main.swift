@@ -4,8 +4,8 @@ import Foundation
 import os
 import QuickTermShared
 
-let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "main")
-var stderr = FileHandle.standardError
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "UI/Main")
+private var stderr = FileHandle.standardError
 
 func daemonExists() -> Bool {
   let bundleIdentifier = Bundle.main.bundleIdentifier!

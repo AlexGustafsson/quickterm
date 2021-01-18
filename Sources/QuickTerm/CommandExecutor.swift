@@ -1,5 +1,8 @@
 import Foundation
+import os
 import QuickTermShared
+
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "UI/CommandExecutor")
 
 class CommandExecutor: CommandExecutorProtocol {
   typealias ExecuteCommandCallback = (CommandConfiguration) -> Void

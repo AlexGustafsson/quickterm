@@ -1,8 +1,11 @@
 import AppKit
 import HotKey
+import os
 import QuickTermLibrary
 import QuickTermShared
 import SwiftUI
+
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "UI/AppDelegate")
 
 struct HistoryItem {
   let command: String

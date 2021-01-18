@@ -2,6 +2,8 @@ import Foundation
 import os
 import QuickTermShared
 
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "UI/Terminal/TerminalSession")
+
 class TerminalSession: Identifiable, ObservableObject, Equatable {
   typealias ActiveChangedCallback = (TerminalSession) -> Void
   var onActiveChanged: ActiveChangedCallback = { _ in }

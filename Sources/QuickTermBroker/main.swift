@@ -2,7 +2,7 @@ import Foundation
 import os
 import QuickTermShared
 
-let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "broker")
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "Broker/Main")
 
 logger.debug("Creating broker listener")
 let listener = NSXPCListener.service()

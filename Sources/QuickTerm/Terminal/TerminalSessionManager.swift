@@ -2,6 +2,8 @@ import Foundation
 import os
 import QuickTermShared
 
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "UI/Terminal/TerminalSessionManager")
+
 class TerminalSessionManager: ObservableObject {
   @Published var sessions: [TerminalSession] = []
 

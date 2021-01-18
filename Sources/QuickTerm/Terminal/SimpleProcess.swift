@@ -1,6 +1,8 @@
 import Foundation
 import os
 
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "UI/Terminal/SimpleProcess")
+
 class SimpleProcess {
   let process: Process
   let stdout: Pipe

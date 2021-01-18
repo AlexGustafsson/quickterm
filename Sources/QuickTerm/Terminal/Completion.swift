@@ -1,4 +1,7 @@
 import Foundation
+import os
+
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "UI/Terminal/Completion")
 
 class CompletionManager: ObservableObject {
   @Published var completions: [String] = []

@@ -1,5 +1,8 @@
 import Foundation
+import os
 import QuickTermShared
+
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "Broker/Broker")
 
 @objc class Broker: NSObject, BrokerProtocol {
   private var executorConnection: NSXPCConnection?

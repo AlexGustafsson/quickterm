@@ -1,4 +1,7 @@
 import Foundation
+import os
+
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "UI/Utilities/FileObserver")
 
 class FileObserver: NSObject, NSFilePresenter {
   lazy var presentedItemOperationQueue = OperationQueue.main

@@ -1,8 +1,11 @@
 import AppKit
+import os
 import QuickTermLibrary
 import QuickTermShared
 import SwiftUI
 import UniformTypeIdentifiers
+
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "UI/CommandSpotlightDelegate")
 
 class CommandSpotlightDelegate: SpotlightDelegate {
   private let spotlight: Spotlight

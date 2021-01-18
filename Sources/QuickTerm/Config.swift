@@ -1,6 +1,9 @@
 import AppKit
 import Foundation
+import os
 import Yams
+
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "UI/Config")
 
 class ConfigParseAlert: NSAlert {
   init(error: Error) {
