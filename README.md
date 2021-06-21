@@ -266,6 +266,8 @@ If you're new to the open source community, Swift, GitHub or just uncertain wher
 
 ### Development
 
+Although you won't need to use Xcode to develop QuickTerm, it's unfortunately required as a build dependency since `xcrun` will look for `xctest` which does not exist unless you install Xcode. Although `xcrun`, `swift` and other dependencies come either pre-installed or are available via `xcode-select` or `brew`, `xctest` only comes with Xcode for now.
+
 ```sh
 # Clone project
 git clone https://github.com/AlexGustafsson/quickterm.git && cd quickterm
