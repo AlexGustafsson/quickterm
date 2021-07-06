@@ -13,9 +13,9 @@ let package = Package(
     .executable(name: "QuickTermBroker", targets: ["QuickTermBroker"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.0")),
+    .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.4.3")),
     .package(url: "https://github.com/soffes/HotKey", from: "0.1.3"),
-    .package(url: "https://github.com/jpsim/Yams.git", from: "4.0.3"),
+    .package(url: "https://github.com/jpsim/Yams.git", from: "4.0.6"),
   ],
   targets: [
     .target(
