@@ -3,25 +3,53 @@ import SwiftUI
 
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "Library/ANSI")
 
-public enum AnsiParseTreeNode {
-  case string(String)
-  case code(AnsiCode)
+public enum AnsiStateChange {
+  case color, unknown
 }
 
 public class AnsiCode: CustomStringConvertible {
   let count: Int
+  let state: AnsiStateChange
+  let parameter1: Int?
+  let parameter2: Int?
 
-  init(_ count: Int) {
+  init(_ state: AnsiStateChange, _ parameter1: Int?, _ parameter2: Int?, _ count: Int) {
+    self.state = state
+    self.parameter1 = parameter1
+    self.parameter2 = parameter2
     self.count = count
   }
 
   static func parse(
     firstParameter: String?,
-    firstCharacter _: Character?,
-    secondParameter _: String?,
+    firstCharacter: Character?,
+    secondParameter: String?,
     secondCharacter _: Character?
   ) -> AnsiCode? {
-    AnsiCode(2 + (firstParameter?.count ?? 0) + 1)
+    let count = 2 + (firstParameter?.count ?? 0) + 1
+    let parameter1 = firstParameter == nil ? nil : Int(firstParameter!)
+    let parameter2 = secondParameter == nil ? nil : Int(secondParameter!)
+    switch firstCharacter {
+    case Ansi.colorOperator:
+      return AnsiCode(.color, parameter1, parameter2, count)
+    default:
+      return AnsiCode(.unknown, parameter1, parameter2, count)
+    }
+  }
+
+  public var color: SwiftUI.Color {
+    switch self.parameter1 {
+    case 0:
+      return SwiftUI.Color.black
+    case 31:
+      return SwiftUI.Color.red
+    case 32:
+      return SwiftUI.Color.green
+    case 33:
+      return SwiftUI.Color.blue
+    default:
+      return SwiftUI.Color.black
+    }
   }
 
   public var description: String {
@@ -38,26 +66,18 @@ public enum Ansi {
   static let bracket = Character("[")
   static let semicolon = Character(";")
   static let tilde = Character("~")
+  static let colorOperator = Character("m")
 
   public static func format(_ text: String) -> Text {
     var color = Color.white
     var nodes = Ansi.parse(text)
     var result = Text("")
-    for node in nodes {
-      switch node {
-      case let .code(code):
-        color = Color.white
-      case let .string(string):
-        result = result + Text(string)
-      }
-    }
     return result
   }
 
-  public static func parse(_ text: String) -> [AnsiParseTreeNode] {
-    var nodes: [AnsiParseTreeNode] = []
+  public static func parse(_ text: String) -> [String.Index: AnsiCode] {
+    var stateChanges: [String.Index: AnsiCode] = [:]
     var potentialCode = Substring(text)
-    var previousNodeIndex = text.startIndex
     logger.info("Got text: \(text)")
     while let index = potentialCode.firstIndex(of: Ansi.escape) {
       logger.info("Found index of escape character")
@@ -113,15 +133,12 @@ public enum Ansi {
         secondParameter: secondParameter,
         secondCharacter: secondCharacter
       ) {
-        nodes.append(.string(String(text[previousNodeIndex ..< index])))
-        nodes.append(.code(code))
+        stateChanges[index] = code
         potentialCode =
           potentialCode[potentialCode.index(potentialCode.startIndex, offsetBy: code.count) ..< potentialCode.endIndex]
-        previousNodeIndex = text.index(previousNodeIndex, offsetBy: code.count)
       }
     }
-    nodes.append(.string(String(potentialCode)))
 
-    return nodes
+    return stateChanges
   }
 }
