@@ -110,7 +110,7 @@ public class Spotlight: ObservableObject {
 
   public func commit() {
     self.hide()
-    if let selectedItem = self.selectedItem {
+    if self.selectedItem != nil {
       self.completeText()
     }
     self.onCommit(self.text)
@@ -250,7 +250,7 @@ public class Spotlight: ObservableObject {
   }
 
   public func tabPressed() {
-    if let selectedItem = self.selectedItem {
+    if self.selectedItem != nil {
       self.completeText()
     } else {
       self.delegate?.tabPressed()
