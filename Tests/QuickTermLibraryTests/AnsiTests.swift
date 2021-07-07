@@ -7,28 +7,20 @@ final class AnsiTests: XCTestCase {
   func testParseAnsiCodes() {
     let raw = "Hello \u{001B}[31mred\u{001B}[0mnothing\u{001B}[badcode"
     let stateChanges = Ansi.parse(raw)
-    XCTAssertEqual(stateChanges.count, 3)
+    XCTAssertEqual(stateChanges.count, 2)
 
     var offset = String.Index(utf16Offset: 6, in: raw)
     XCTAssertNotNil(stateChanges[offset])
     if let setState = stateChanges[offset] {
       XCTAssertEqual(setState.count, 5)
-      XCTAssertEqual(setState.state, .color)
-      XCTAssertEqual(setState.color, SwiftUI.Color.red)
+      XCTAssertEqual(setState.state.color, SwiftUI.Color.red)
     }
 
     offset = String.Index(utf16Offset: 14, in: raw)
     XCTAssertNotNil(stateChanges[offset])
     if let setState = stateChanges[offset] {
       XCTAssertEqual(setState.count, 4)
-      XCTAssertEqual(setState.state, .reset)
-    }
-
-    offset = String.Index(utf16Offset: 25, in: raw)
-    XCTAssertNotNil(stateChanges[offset])
-    if let setState = stateChanges[offset] {
-      XCTAssertEqual(setState.count, 3)
-      XCTAssertEqual(setState.state, .unknown)
+      XCTAssertTrue(setState.state.isReset)
     }
   }
 
@@ -41,29 +33,42 @@ final class AnsiTests: XCTestCase {
     XCTAssertNotNil(stateChanges[offset])
     if let setState = stateChanges[offset] {
       XCTAssertEqual(setState.count, 5)
-      XCTAssertEqual(setState.state, .color)
-      XCTAssertEqual(setState.color, SwiftUI.Color.red)
+      XCTAssertEqual(setState.state.color, SwiftUI.Color.red)
     }
 
     offset = String.Index(utf16Offset: 5, in: raw)
     XCTAssertNotNil(stateChanges[offset])
     if let setState = stateChanges[offset] {
       XCTAssertEqual(setState.count, 4)
-      XCTAssertEqual(setState.state, .bold)
+      XCTAssertTrue(setState.state.bold ?? false)
     }
 
     offset = String.Index(utf16Offset: 17, in: raw)
     XCTAssertNotNil(stateChanges[offset])
     if let setState = stateChanges[offset] {
       XCTAssertEqual(setState.count, 4)
-      XCTAssertEqual(setState.state, .reset)
+      XCTAssertTrue(setState.state.isReset)
     }
 
     offset = String.Index(utf16Offset: 21, in: raw)
     XCTAssertNotNil(stateChanges[offset])
     if let setState = stateChanges[offset] {
       XCTAssertEqual(setState.count, 4)
-      XCTAssertEqual(setState.state, .reset)
+      XCTAssertTrue(setState.state.isReset)
+    }
+  }
+
+  func testDualAnsiCodes() {
+    let raw = "\u{001B}[01;31mbold red"
+    let stateChanges = Ansi.parse(raw)
+    XCTAssertEqual(stateChanges.count, 1)
+
+    var offset = String.Index(utf16Offset: 0, in: raw)
+    XCTAssertNotNil(stateChanges[offset])
+    if let setState = stateChanges[offset] {
+      XCTAssertEqual(setState.count, 7)
+      XCTAssertEqual(setState.state.color, SwiftUI.Color.red)
+      XCTAssertTrue(setState.state.bold ?? false)
     }
   }
 
