@@ -3,6 +3,17 @@ import SwiftUI
 
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "Library/ANSI")
 
+private let palette = [
+  Color.black,
+  Color.red,
+  Color.green,
+  Color.yellow,
+  Color.blue,
+  Color(red: 0.79, green: 0.26, blue: 0.76),
+  Color(red: 0.30, green: 0.78, blue: 0.73),
+  Color.white,
+]
+
 public enum AnsiStateChange {
   case color, unknown, bold, italic, underline, reset
 }
@@ -50,18 +61,13 @@ public class AnsiCode: CustomStringConvertible {
   }
 
   public var color: SwiftUI.Color {
-    switch self.parameter1 {
-    case 0:
-      return SwiftUI.Color.black
-    case 31:
-      return SwiftUI.Color.red
-    case 32:
-      return SwiftUI.Color.green
-    case 33:
-      return SwiftUI.Color.blue
-    default:
-      return SwiftUI.Color.black
+    if let index = self.parameter1 {
+      if index >= 30, index - 30 < palette.count {
+        return palette[index - 30]
+      }
     }
+
+    return SwiftUI.Color.black
   }
 
   public var description: String {
