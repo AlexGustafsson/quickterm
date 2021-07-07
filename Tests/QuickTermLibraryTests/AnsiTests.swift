@@ -4,7 +4,7 @@ import XCTest
 @testable import QuickTermLibrary
 
 final class AnsiTests: XCTestCase {
-  func parseAnsiCodes() {
+  func testParseAnsiCodes() {
     let raw = "Hello \u{001B}[31mred\u{001B}[0mnothing\u{001B}[badcode"
     let stateChanges = Ansi.parse(raw)
     XCTAssertEqual(stateChanges.count, 10)
