@@ -32,4 +32,11 @@ final class AnsiTests: XCTestCase {
       XCTAssertEqual(bad.state, .unknown)
     }
   }
+
+  func testFormatAnsiCodes() {
+    let raw = "Hello \u{001B}[31mred\u{001B}[0mnothing\u{001B}[badcode"
+    let expected = "Hello red nothing badcode"
+    let formatted = Ansi.format(raw)
+    XCTAssertEqual(formatted, Text("Hello ") + Text("red").foregroundColor(SwiftUI.Color.red) + Text("adcode"))
+  }
 }

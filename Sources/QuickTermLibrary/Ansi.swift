@@ -69,9 +69,32 @@ public enum Ansi {
   static let colorOperator = Character("m")
 
   public static func format(_ text: String) -> Text {
-    var color = Color.white
-    var nodes = Ansi.parse(text)
-    var result = Text("")
+    // Current state
+    var color = Color.black
+
+    let stateChanges = Ansi.parse(text)
+
+    var result = Text(verbatim: "")
+    var previousOffset = text.startIndex
+
+    // Mutate the state left to right using the state changes, rendering the
+    // final text using the Text's + operand with the state as the styling
+    let offsets = stateChanges.keys.sorted()
+    for offset in offsets {
+      let state = stateChanges[offset]!
+      // Render the text up until this state change
+      result = result + Text(verbatim: String(text[previousOffset ..< offset])).foregroundColor(color)
+      // Modify the state
+      switch state.state {
+      case .color:
+        color = state.color
+      default:
+        break
+      }
+      // Move past the current ANSI code
+      previousOffset = text.index(offset, offsetBy: state.count)
+    }
+    result = result + Text(verbatim: String(text.suffix(from: previousOffset))).foregroundColor(color)
     return result
   }
 
