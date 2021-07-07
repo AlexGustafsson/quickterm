@@ -7,9 +7,9 @@ final class AnsiTests: XCTestCase {
   func testParseAnsiCodes() {
     let raw = "Hello \u{001B}[31mred\u{001B}[0mnothing\u{001B}[badcode"
     let stateChanges = Ansi.parse(raw)
-    XCTAssertEqual(stateChanges.count, 10)
+    XCTAssertEqual(stateChanges.count, 3)
 
-    var offset = String.Index(utf16Offset: 5, in: raw)
+    var offset = String.Index(utf16Offset: 6, in: raw)
     XCTAssertNotNil(stateChanges[offset])
     if let setColor = stateChanges[offset] {
       XCTAssertEqual(setColor.count, 5)
@@ -17,7 +17,7 @@ final class AnsiTests: XCTestCase {
       XCTAssertEqual(setColor.color, SwiftUI.Color.red)
     }
 
-    offset = String.Index(utf16Offset: 13, in: raw)
+    offset = String.Index(utf16Offset: 14, in: raw)
     XCTAssertNotNil(stateChanges[offset])
     if let setColor = stateChanges[offset] {
       XCTAssertEqual(setColor.count, 4)
