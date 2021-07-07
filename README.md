@@ -300,6 +300,8 @@ make format
 # Build the application
 # Creates ./build/QuickTerm.app
 make build
+# Build using specific flags, such as an address sanitizer
+SWIFT_FLAGS="--sanitize address" make build
 
 # Sign the application
 # Use "security find-identity -v -p codesigning" to find available certificates.

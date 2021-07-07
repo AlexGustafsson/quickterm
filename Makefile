@@ -25,7 +25,7 @@ build: build/QuickTerm.app
 # Macro to create a rule to build a module
 define buildModule
 build/$(1)/release/$(1): $(shell find "Sources/$(1)" -type f -name "*.swift") $(sharedSource) SupportingFiles/$(1)/Info.plist
-	swift build --configuration release --product "$(1)" --build-path "build/$(1)"
+	swift build --configuration release --product "$(1)" --build-path "build/$(1)" $(SWIFT_FLAGS)
 endef
 
 # Create the build rule for all modules
