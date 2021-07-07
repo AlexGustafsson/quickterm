@@ -26,6 +26,7 @@ public class AnsiCode: CustomStringConvertible {
     secondParameter: String?,
     secondCharacter _: Character?
   ) -> AnsiCode? {
+    // \e + [ + x + y
     let count = 2 + (firstParameter?.count ?? 0) + 1
     let parameter1 = firstParameter == nil ? nil : Int(firstParameter!)
     let parameter2 = secondParameter == nil ? nil : Int(secondParameter!)
@@ -147,9 +148,7 @@ public enum Ansi {
   public static func parse(_ text: String) -> [String.Index: AnsiCode] {
     var stateChanges: [String.Index: AnsiCode] = [:]
     var potentialCode = Substring(text)
-    logger.info("Got text: \(text)")
     while let index = potentialCode.firstIndex(of: Ansi.escape) {
-      logger.info("Found index of escape character")
       // Skip the escape code
       potentialCode = potentialCode[potentialCode.index(index, offsetBy: 1) ..< potentialCode.endIndex]
       var state: AnsiState = .escape
@@ -166,32 +165,24 @@ public enum Ansi {
         // <esc> '[' (<num>) (';'<num>) '~'      -> keycode sequence, <num> defaults to 1
         if state == .escape, character == Ansi.escape {
           state = .escape
-          logger.info("Escape")
         } else if state == .escape, character == Ansi.bracket {
           state = .bracket
-          logger.info("Bracket")
         } else if state == .bracket || state == .firstParameter, character.isNumber {
           firstParameter.append(character)
           state = .firstParameter
-          logger.info("First parameter")
         } else if state == .firstParameter, character != Ansi.semicolon {
           firstCharacter = character
           state = .firstCharacter
-          logger.info("First character")
         } else if state == .firstCharacter || state == .firstParameter, character == Ansi.semicolon {
           state = .semicolon
-          logger.info("Semi")
         } else if state == .semicolon || state == .secondParameter, character.isNumber {
           secondParameter.append(character)
           state = .secondParameter
-          logger.info("Second parameter")
         } else if state == .secondParameter {
           secondCharacter = character
           state = .end
-          logger.info("Second character")
         } else {
           // Unable to parse this sequence, or it has ended - go to the next
-          logger.info("Unable to parse")
           break
         }
       }
@@ -204,7 +195,10 @@ public enum Ansi {
       ) {
         stateChanges[index] = code
         potentialCode =
-          potentialCode[potentialCode.index(potentialCode.startIndex, offsetBy: code.count) ..< potentialCode.endIndex]
+          potentialCode[
+            potentialCode.index(potentialCode.startIndex, offsetBy: code.count - 1) ..< potentialCode
+              .endIndex
+          ]
       }
     }
 
