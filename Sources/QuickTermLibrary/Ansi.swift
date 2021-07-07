@@ -4,7 +4,7 @@ import SwiftUI
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "Library/ANSI")
 
 public enum AnsiStateChange {
-  case color, unknown
+  case color, unknown, bold, italic, underline, reset
 }
 
 public class AnsiCode: CustomStringConvertible {
@@ -30,8 +30,19 @@ public class AnsiCode: CustomStringConvertible {
     let parameter1 = firstParameter == nil ? nil : Int(firstParameter!)
     let parameter2 = secondParameter == nil ? nil : Int(secondParameter!)
     switch firstCharacter {
-    case Ansi.colorOperator:
-      return AnsiCode(.color, parameter1, parameter2, count)
+    case Ansi.styleOperator:
+      switch parameter1 {
+      case 0:
+        return AnsiCode(.reset, parameter1, parameter2, count)
+      case 1:
+        return AnsiCode(.bold, parameter1, parameter2, count)
+      case 3:
+        return AnsiCode(.italic, parameter1, parameter2, count)
+      case 4:
+        return AnsiCode(.underline, parameter1, parameter2, count)
+      default:
+        return AnsiCode(.color, parameter1, parameter2, count)
+      }
     default:
       return AnsiCode(.unknown, parameter1, parameter2, count)
     }
@@ -66,11 +77,34 @@ public enum Ansi {
   static let bracket = Character("[")
   static let semicolon = Character(";")
   static let tilde = Character("~")
-  static let colorOperator = Character("m")
+  static let styleOperator = Character("m")
+
+  public static func format(
+    _ text: String,
+    _ color: SwiftUI.Color,
+    _ bold: Bool,
+    _ italic: Bool,
+    _ underline: Bool
+  ) -> SwiftUI.Text {
+    var part = Text(verbatim: text).foregroundColor(color)
+    if bold {
+      part = part.bold()
+    }
+    if italic {
+      part = part.italic()
+    }
+    if underline {
+      part = part.underline()
+    }
+    return part
+  }
 
   public static func format(_ text: String) -> Text {
     // Current state
     var color = Color.black
+    var bold = false
+    var italic = false
+    var underline = false
 
     let stateChanges = Ansi.parse(text)
 
@@ -83,18 +117,30 @@ public enum Ansi {
     for offset in offsets {
       let state = stateChanges[offset]!
       // Render the text up until this state change
-      result = result + Text(verbatim: String(text[previousOffset ..< offset])).foregroundColor(color)
+      result = result + Ansi.format(String(text[previousOffset ..< offset]), color, bold, italic, underline)
+
       // Modify the state
       switch state.state {
       case .color:
         color = state.color
+      case .bold:
+        bold = true
+      case .italic:
+        italic = true
+      case .underline:
+        underline = true
+      case .reset:
+        color = SwiftUI.Color.black
+        bold = false
+        italic = false
+        underline = false
       default:
         break
       }
       // Move past the current ANSI code
       previousOffset = text.index(offset, offsetBy: state.count)
     }
-    result = result + Text(verbatim: String(text.suffix(from: previousOffset))).foregroundColor(color)
+    result = result + Ansi.format(String(text.suffix(from: previousOffset)), color, bold, italic, underline)
     return result
   }
 
