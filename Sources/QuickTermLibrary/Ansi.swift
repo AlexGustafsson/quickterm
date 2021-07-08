@@ -4,9 +4,37 @@ public struct DecoratedString {
   private let parsed: ANSIParseTree
   public let value: String
 
-  init(fromString text: String) {
+  public init(fromString text: String) {
     self.parsed = ANSIParser.parse(text)
     self.value = text
+  }
+
+  public var text: Text {
+    var rendered = Text("")
+
+    var indices: Set<String.Index> = []
+    for index in self.parsed.controlCharacters.keys {
+      indices.insert(index)
+    }
+    for index in self.parsed.escapeSequences.keys {
+      indices.insert(index)
+    }
+
+    for index in indices.sorted() {
+      let controlCharacter = self.parsed.controlCharacters[index]
+      switch controlCharacter {
+      case .bell:
+        rendered = rendered + Text("!")
+      default:
+        break
+      }
+    }
+
+    return rendered
+  }
+
+  public var hasBell: Bool {
+    self.parsed.controlCharacters.values.contains(.bell)
   }
 }
 
